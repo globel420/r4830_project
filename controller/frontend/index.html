@@ -184,6 +184,27 @@
       </section>
 
       <section class="card">
+        <h2>Identity and Security</h2>
+        <div class="grid grid-3">
+          <label>
+            Charger Name
+            <input id="charger-name" type="text" maxlength="16" value="ChargeFast" />
+          </label>
+          <label>
+            BLE Password
+            <input id="ble-password" type="text" maxlength="16" value="" />
+          </label>
+          <div class="actions">
+            <button class="btn" data-action="save_name">Save Name</button>
+            <button class="btn" data-action="save_password">Save Password</button>
+          </div>
+        </div>
+        <p class="hint mono">
+          Name/password commands are currently candidate mappings and should be hardware-tested.
+        </p>
+      </section>
+
+      <section class="card">
         <h2>Raw TX</h2>
         <div class="toolbar">
           <input

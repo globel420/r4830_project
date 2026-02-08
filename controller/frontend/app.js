@@ -35,6 +35,8 @@ const dom = {
   twoStage: document.getElementById("two-stage"),
   multiMotor: document.getElementById("multi-motor"),
   displayLanguage: document.getElementById("display-language"),
+  chargerName: document.getElementById("charger-name"),
+  blePassword: document.getElementById("ble-password"),
   tmInputV: document.getElementById("tm-input-v"),
   tmInputA: document.getElementById("tm-input-a"),
   tmOutputV: document.getElementById("tm-output-v"),
@@ -175,6 +177,26 @@ function buildFrame05FromBytes(cmdId, b0, b1, b2) {
   }
   out[5] = checksum;
   return out;
+}
+
+function asciiOnly(input) {
+  return String(input || "")
+    .split("")
+    .filter((ch) => {
+      const code = ch.charCodeAt(0);
+      return code >= 0x20 && code <= 0x7e;
+    })
+    .join("");
+}
+
+function buildFrameAscii(cmdId, rawValue, maxLen = 16) {
+  const sanitized = asciiOnly(rawValue).trim();
+  const clipped = sanitized.length > maxLen ? sanitized.slice(0, maxLen) : sanitized;
+  const dataBytes = [...clipped].map((ch) => ch.charCodeAt(0));
+  dataBytes.push(0x00);
+  const checksum = (cmdId + dataBytes.reduce((sum, b) => sum + b, 0)) & 0xff;
+  const len = dataBytes.length + 1;
+  return Uint8Array.from([len, cmdId & 0xff, ...dataBytes, checksum]);
 }
 
 function decodePayload(bytesInput) {
@@ -935,6 +957,26 @@ async function handleAction(action) {
           ? buildFrame05FromBytes(0x2a, 0x7a, 0x68, 0x00)
           : buildFrame05FromBytes(0x2a, 0x65, 0x6e, 0x00);
       await runSave("display_language", bytes, "display_language");
+      return;
+    }
+    case "save_name": {
+      const value = String(dom.chargerName.value || "");
+      if (!value.trim()) {
+        throw new Error("Charger name cannot be empty");
+      }
+      await runSave("safety_bluetooth_name", buildFrameAscii(0x1e, value, 16), "rename_charger_candidate");
+      return;
+    }
+    case "save_password": {
+      const value = String(dom.blePassword.value || "");
+      if (!value.trim()) {
+        throw new Error("Password cannot be empty");
+      }
+      await runSave(
+        "safety_change_password",
+        buildFrameAscii(0x1b, value, 16),
+        "set_ble_password_candidate",
+      );
       return;
     }
     default:

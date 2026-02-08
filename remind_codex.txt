@@ -64,3 +64,8 @@ CHECKPOINT 2026-02-08T20:32:00Z
   - cd /Users/globel/r4830_project/controller/frontend
   - python3 -m http.server 8787
   - open http://localhost:8787 in desktop Chrome/Edge
+
+CHECKPOINT 2026-02-08T20:36:00Z
+- Web app now includes candidate name/password actions:
+  - rename charger -> cmd 0x1E ASCII frame
+  - set BLE password -> cmd 0x1B ASCII frame
