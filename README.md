@@ -56,6 +56,7 @@ Then open `http://localhost:8787`.
 - `controller/backend/R4830_CONTROL_SPEC.md`
 - `controller/backend/ble_definitions.yaml`
 - `swift/README.md`
+- `FUNCTIONAL_FREEZE_CHECKLIST.md`
 
 ## Safety
 This project can control live charger output settings (voltage/current/power behaviors). Test changes carefully and validate hardware limits before applying aggressive values.
