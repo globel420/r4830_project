@@ -94,3 +94,9 @@ CHECKPOINT 2026-02-08T22:05:00Z
   - /Users/globel/r4830_project/FUNCTIONAL_FREEZE_CHECKLIST.md
 - Checklist has 27 line-by-line items + pass criteria + total timeline.
 - OEM use remains fallback-only, especially for password safety validation.
+
+CHECKPOINT 2026-02-08T22:12:00Z
+- Split checklist into:
+  - Batch A (no wheel / no active charging)
+  - Batch B (wheel / active charging)
+- Added batch subtotals and execution order to minimize wheel setup time.
