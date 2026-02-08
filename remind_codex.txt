@@ -69,3 +69,11 @@ CHECKPOINT 2026-02-08T20:36:00Z
 - Web app now includes candidate name/password actions:
   - rename charger -> cmd 0x1E ASCII frame
   - set BLE password -> cmd 0x1B ASCII frame
+
+CHECKPOINT 2026-02-08T20:42:00Z
+- Web app language selector expanded to 3 options:
+  - English
+  - Chinese (Simplified)
+  - Chinese (Traditional, candidate)
+- Added candidate `0x2A` frame for traditional Chinese:
+  - 052a7a740018

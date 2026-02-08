@@ -23,6 +23,10 @@ Open:
 - RX notifications + TX writes.
 - 0x06 and 0x05 frame builders for known commands.
 - Candidate ASCII-frame actions for charger rename (`0x1E`) and BLE password set (`0x1B`).
+- Language selector now includes 3 options:
+  - English (`052a656e00fd`)
+  - Chinese (Simplified) (`052a7a68000c`)
+  - Chinese (Traditional) candidate (`052a7a740018`)
 - ACK handling (`0x03`) with Save Tracking (`ACK/NO_ACK/REJECTED/FAILED`).
 - Keepalive loop (`020606`).
 - Telemetry summary parsing for known `3006` / `6905` and `0x06` fields.

@@ -179,6 +179,22 @@ function buildFrame05FromBytes(cmdId, b0, b1, b2) {
   return out;
 }
 
+function languageLabelFromBytes(b0, b1) {
+  if (b0 === 0x65 && b1 === 0x6e) {
+    return "English";
+  }
+  if (b0 === 0x7a && b1 === 0x68) {
+    return "Chinese (Simplified)";
+  }
+  if (b0 === 0x7a && b1 === 0x74) {
+    return "Chinese (Traditional)";
+  }
+  if (typeof b0 === "number" && typeof b1 === "number") {
+    return `Unknown (${toHexByte(b0)}${toHexByte(b1)})`;
+  }
+  return null;
+}
+
 function asciiOnly(input) {
   return String(input || "")
     .split("")
@@ -573,11 +589,7 @@ function handleRxDecoded(decoded, hex) {
     if (!t.displayLanguage) {
       const lang0 = u8At(decoded, 93);
       const lang1 = u8At(decoded, 94);
-      if (lang0 === 0x65 && lang1 === 0x6e) {
-        t.displayLanguage = "English";
-      } else if (lang0 === 0x7a && lang1 === 0x68) {
-        t.displayLanguage = "Chinese";
-      }
+      t.displayLanguage = languageLabelFromBytes(lang0, lang1) || t.displayLanguage;
     }
   }
 
@@ -586,11 +598,7 @@ function handleRxDecoded(decoded, hex) {
     if (cmd === 0x2a) {
       const b2 = asInt(decoded.u8_02);
       const b3 = asInt(decoded.u8_03);
-      if (b2 === 0x65 && b3 === 0x6e) {
-        t.displayLanguage = "English";
-      } else if (b2 === 0x7a && b3 === 0x68) {
-        t.displayLanguage = "Chinese";
-      }
+      t.displayLanguage = languageLabelFromBytes(b2, b3) || t.displayLanguage;
     }
   }
 
@@ -952,10 +960,15 @@ async function handleAction(action) {
     }
     case "save_language": {
       const selected = dom.displayLanguage.value;
-      const bytes =
-        selected === "chinese"
-          ? buildFrame05FromBytes(0x2a, 0x7a, 0x68, 0x00)
-          : buildFrame05FromBytes(0x2a, 0x65, 0x6e, 0x00);
+      const bytes = (() => {
+        if (selected === "chinese_simplified") {
+          return buildFrame05FromBytes(0x2a, 0x7a, 0x68, 0x00); // "zh"
+        }
+        if (selected === "chinese_traditional") {
+          return buildFrame05FromBytes(0x2a, 0x7a, 0x74, 0x00); // "zt" candidate
+        }
+        return buildFrame05FromBytes(0x2a, 0x65, 0x6e, 0x00); // "en"
+      })();
       await runSave("display_language", bytes, "display_language");
       return;
     }
