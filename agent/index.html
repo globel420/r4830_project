@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R4830 Bluetooth Payload Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate & Electric Indigo - Optimized for technical documentation and code legibility. -->
+    <!-- Application Structure Plan: 
+         1. Research Insights: Contextualizes the hardware origins (Huawei R48xx) and its specific niche in the PEV market.
+         2. Full Payload Lab: A comprehensive interactive tool supporting all known command registers (Float, Uint, Toggle, ASCII).
+         3. Reference Dictionary: A master table of addresses and data types.
+         4. Flutter Implementation: A dedicated code section for Dart-based Bluetooth communication.
+    -->
+    <!-- Visualization & Content Choices:
+         - Multistage Charging Chart: Visualizes the logic behind Stage 1 and Stage 2 transitions.
+         - Color-coded Byte Explorer: Breaks down frames into Header, Command, Data, and Checksum.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin: auto; 
+            height: 320px; 
+            max-height: 400px; 
+        }
+        .hex-byte {
+            display: inline-block;
+            padding: 0.4rem 0.6rem;
+            margin: 0.15rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .byte-len { background: #e2e8f0; color: #64748b; }
+        .byte-cmd { background: #dbeafe; color: #2563eb; }
+        .byte-data { background: #dcfce7; color: #15803d; }
+        .byte-chk { background: #fee2e2; color: #b91c1c; }
+        
+        .nav-item.active {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+        .code-block {
+            background-color: #0f172a;
+            color: #94a3b8;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col lg:flex-row min-h-screen">
+
+    <!-- Navigation Sidebar -->
+    <nav class="w-full lg:w-72 bg-white border-r border-slate-200 lg:h-screen lg:sticky lg:top-0 flex-shrink-0 z-50">
+        <div class="p-8">
+            <h1 class="text-xl font-black text-slate-800 tracking-tighter leading-none">R4830<br><span class="text-indigo-600 uppercase">Payload Library</span></h1>
+            <p class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">Protocol Version 2.6</p>
+        </div>
+        <div class="px-4 space-y-1">
+            <button onclick="navTo('knowledge')" id="btn-knowledge" class="nav-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition active">Research Insights</button>
+            <button onclick="navTo('lab')" id="btn-lab" class="nav-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition">Complete Payload Lab</button>
+            <button onclick="navTo('reference')" id="btn-reference" class="nav-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition">Command Reference</button>
+            <button onclick="navTo('flutter')" id="btn-flutter" class="nav-item w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition">Flutter Implementation</button>
+        </div>
+    </nav>
+
+    <!-- Content Area -->
+    <main class="flex-1 p-6 lg:p-12 overflow-x-hidden" id="main-view">
+        
+        <!-- SECTION: KNOWLEDGE BASE -->
+        <section id="knowledge" class="space-y-10 animate-fade">
+            <header>
+                <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Research Insights</h2>
+                <p class="text-lg text-slate-500 mt-2">Historical and technical context of the HW Smart Charger family.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span>🔌</span> Industry Origin</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        The protocol was developed to interface with <strong>Huawei R48xx Telecom Rectifiers</strong> (R4830G, R4850G2, R4875G1). These units were originally engineered by Huawei for mission-critical cellular base stations. Third-party developers created the <strong>HW48 Series Bluetooth Board</strong> to "unlock" these units for high-power battery charging.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span>🏷️</span> Manufacturing Brands</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        These chargers are sold under various brand names including <strong>Hou NIN</strong>, <strong>Pidzoom</strong>, and <strong>Roger Charger</strong>. Despite the exterior branding, they all share a common "HW" firmware architecture. The protocol is used to provide a modern mobile-app interface to a traditionally industrial piece of hardware.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 md:col-span-2">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><span>⚙️</span> Operational Use Case</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        The primary application is charging high-voltage battery packs found in Electric Unicycles (EUCs) and electric scooters. The protocol allows the user to switch between <strong>Stage 1 (Bulk)</strong>—where the rectifier outputs maximum current—and <strong>Stage 2 (Absorption)</strong>—where it targets a specific peak voltage.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                <h3 class="text-center font-bold text-slate-400 uppercase tracking-widest text-xs mb-8">Multi-Stage Logic Transition</h3>
+                <div class="chart-container">
+                    <canvas id="chargeChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: COMPLETE PAYLOAD LAB -->
+        <section id="lab" class="hidden space-y-8 animate-fade">
+            <header>
+                <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight text-center lg:text-left">Complete Payload Lab</h2>
+                <p class="text-lg text-slate-500 mt-2 text-center lg:text-left">Build and verify binary packets for every known command register.</p>
+            </header>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <!-- Control Center -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+                    <div>
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-2">Target Register</label>
+                        <select id="cmdSelect" onchange="syncLab()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer">
+                            <optgroup label="Stage 1 (Bulk Charge)">
+                                <option value="0x1F,float,val">Stage 1 Voltage (0x1F)</option>
+                                <option value="0x20,float,val">Stage 1 Current (0x20)</option>
+                            </optgroup>
+                            <optgroup label="Stage 2 (Absorption)">
+                                <option value="0x21,float,val">Stage 2 Voltage (0x21)</option>
+                                <option value="0x22,float,val">Stage 2 Current (0x22)</option>
+                            </optgroup>
+                            <optgroup label="System Controls">
+                                <option value="0x23,uint,toggle">Master Output Switch (0x23)</option>
+                                <option value="0x0C,uint,toggle">Current Path Enable (0x0C)</option>
+                                <option value="0x2F,uint,toggle">Equal Distribution (0x2F)</option>
+                                <option value="0x26,uint,val">Soft Start Ramp (0x26)</option>
+                                <option value="0x15,float,val">Power-off Threshold (0x15)</option>
+                            </optgroup>
+                            <optgroup label="Device Identity">
+                                <option value="0x1E,ascii,text">Rename Charger (0x1E)</option>
+                                <option value="0x1B,ascii,text">Set BLE Password (0x1B)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div id="dynamicInput">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 pt-6 border-t border-slate-100 text-center">
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <span class="block text-[8px] font-black text-slate-400 uppercase">Data Type</span>
+                            <span id="labType" class="text-[10px] font-mono font-bold text-slate-600">FLOAT32</span>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <span class="block text-[8px] font-black text-slate-400 uppercase">Endianness</span>
+                            <span class="text-[10px] font-mono font-bold text-slate-600">LITTLE</span>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg">
+                            <span class="block text-[8px] font-black text-slate-400 uppercase">Checksum</span>
+                            <span class="text-[10px] font-mono font-bold text-slate-600">8-BIT SUM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Packet Visualizer -->
+                <div class="bg-slate-900 rounded-3xl p-8 text-white flex flex-col">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-8 text-center">Constructed Frame Structure</h3>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center">
+                        <div id="hexContainer" class="flex flex-wrap justify-center gap-1 mb-10">
+                            <!-- Rendered by JS -->
+                        </div>
+
+                        <div class="w-full bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50">
+                            <div class="flex justify-between items-center mb-4 text-[10px] font-bold text-slate-400 uppercase">
+                                <span>Logic Breakdown</span>
+                                <span class="text-indigo-400" id="totalByteLabel">7 Bytes Total</span>
+                            </div>
+                            <div class="grid grid-cols-4 gap-2 text-center">
+                                <div class="bg-slate-800 p-2 rounded border border-slate-600">
+                                    <div class="text-[8px] text-slate-500 mb-1">LEN-1</div>
+                                    <div id="statLen" class="font-mono text-xs">0x06</div>
+                                </div>
+                                <div class="bg-indigo-900/40 p-2 rounded border border-indigo-500/30">
+                                    <div class="text-[8px] text-indigo-400 mb-1">CMD</div>
+                                    <div id="statCmd" class="font-mono text-xs">0x1F</div>
+                                </div>
+                                <div class="bg-emerald-900/40 p-2 rounded border border-emerald-500/30">
+                                    <div class="text-[8px] text-emerald-400 mb-1">DATA</div>
+                                    <div id="statData" class="font-mono text-xs">4 Bytes</div>
+                                </div>
+                                <div class="bg-red-900/40 p-2 rounded border border-red-500/30">
+                                    <div class="text-[8px] text-red-400 mb-1">CHK</div>
+                                    <div id="statChk" class="font-mono text-xs">0x00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: DICTIONARY -->
+        <section id="reference" class="hidden space-y-8 animate-fade">
+            <header>
+                <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Technical Dictionary</h2>
+            </header>
+            <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-400 tracking-widest border-b border-slate-200">
+                        <tr>
+                            <th class="px-8 py-5">Register Function</th>
+                            <th class="px-8 py-5 text-center">ID (Hex)</th>
+                            <th class="px-8 py-5">Type</th>
+                            <th class="px-8 py-5">Value Definition</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr><td class="px-8 py-4 font-bold">Stage 1 Voltage</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x1F</td><td class="px-8 py-4">Float32 LE</td><td class="px-8 py-4 text-slate-500 italic">Bulk Charge Limit (Volts)</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Stage 1 Current</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x20</td><td class="px-8 py-4">Float32 LE</td><td class="px-8 py-4 text-slate-500 italic">Bulk Charge Limit (Amperes)</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Stage 2 Voltage</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x21</td><td class="px-8 py-4">Float32 LE</td><td class="px-8 py-4 text-slate-500 italic">Absorption Target (Volts)</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Stage 2 Current</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x22</td><td class="px-8 py-4">Float32 LE</td><td class="px-8 py-4 text-slate-500 italic">Absorption Target (Amperes)</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Output Switch</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x23</td><td class="px-8 py-4">Uint32 LE</td><td class="px-8 py-4 text-slate-500 italic">0: Disable, 1: Enable</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Current Path</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x0C</td><td class="px-8 py-4">Uint32 LE</td><td class="px-8 py-4 text-slate-500 italic">Enablement toggle</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Soft Start Ramp</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x26</td><td class="px-8 py-4">Uint32 LE</td><td class="px-8 py-4 text-slate-500 italic">Seconds (e.g. 5, 8, 10)</td></tr>
+                        <tr><td class="px-8 py-4 font-bold">Power-off Limit</td><td class="px-8 py-4 font-mono text-indigo-600 text-center">0x15</td><td class="px-8 py-4">Float32 LE</td><td class="px-8 py-4 text-slate-500 italic">Current Threshold to STOP</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION: FLUTTER IMPLEMENTATION -->
+        <section id="flutter" class="hidden space-y-8 animate-fade">
+            <header>
+                <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Flutter Implementation</h2>
+                <p class="text-lg text-slate-500 mt-2">Core Dart modules for byte-level control via <code>flutter_blue_plus</code>.</p>
+            </header>
+
+            <div class="grid grid-cols-1 gap-6">
+                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                    <div class="px-8 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest">Protocol Helpers (Byte Manipulation)</h3>
+                    </div>
+                    <div class="p-8 code-block">
+                        <pre class="font-mono text-[11px] leading-relaxed">
+import 'dart:typed_data';
+
+/// Encodes numeric values into the required Little Endian byte arrays.
+class R4830Encoder {
+  static List&lt;int&gt; float32ToBytes(double val) {
+    final bd = ByteData(4)..setFloat32(0, val, Endian.little);
+    return bd.buffer.asUint8List();
+  }
+
+  static List&lt;int&gt; uint32ToBytes(int val) {
+    final bd = ByteData(4)..setUint32(0, val, Endian.little);
+    return bd.buffer.asUint8List();
+  }
+
+  static List&lt;int&gt; asciiToBytes(String val) {
+    return [...val.codeUnits, 0x00]; // Includes NUL terminator
+  }
+}
+                        </pre>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                    <div class="px-8 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest">Frame Builder & Transmission</h3>
+                    </div>
+                    <div class="p-8 code-block">
+                        <pre class="font-mono text-[11px] leading-relaxed">
+Future&lt;void&gt; writeCommand(BluetoothCharacteristic characteristic, int cmdId, List&lt;int&gt; data) async {
+  // Logic: The Checksum is the 8-bit sum of (CMD_BYTE + DATA_BYTES)
+  final int dataSum = data.fold(0, (acc, byte) => acc + byte);
+  final int checksum = (cmdId + dataSum) & 0xFF;
+
+  // Packet Structure: [Header, Command, Data_0...Data_N, Checksum]
+  // Byte 0 (Header) = Total Frame Length - 1
+  final List&lt;int&gt; packet = [
+    data.length + 1, // Header
+    cmdId,
+    ...data,
+    checksum
+  ];
+
+  // Send to TX Characteristic (0xFFE3)
+  await characteristic.write(packet, withoutResponse: true);
+}
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- State Management ---
+        let appState = {
+            cmdHex: '0x1F',
+            dataType: 'float',
+            inputType: 'val',
+            numericVal: 150.0,
+            toggleVal: 1,
+            textVal: 'HW_Charger'
+        };
+
+        // --- Navigation Logic ---
+        function navTo(id) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('btn-' + id).classList.add('active');
+            if(id === 'knowledge') initChart();
+        }
+
+        // --- Lab Controller ---
+        function syncLab() {
+            const [hex, dtype, itype] = document.getElementById('cmdSelect').value.split(',');
+            appState.cmdHex = hex;
+            appState.dataType = dtype;
+            appState.inputType = itype;
+
+            const inputContainer = document.getElementById('dynamicInput');
+            let html = '';
+
+            if (itype === 'toggle') {
+                html = `
+                    <div class="flex gap-2">
+                        <button onclick="updateValue(1)" id="tglOn" class="flex-1 py-3 rounded-xl border-2 font-bold transition ${appState.toggleVal ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-200 text-slate-400'}">ENABLE (1)</button>
+                        <button onclick="updateValue(0)" id="tglOff" class="flex-1 py-3 rounded-xl border-2 font-bold transition ${!appState.toggleVal ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-200 text-slate-400'}">DISABLE (0)</button>
+                    </div>`;
+            } else if (itype === 'text') {
+                html = `
+                    <div class="space-y-1">
+                        <input type="text" maxlength="16" placeholder="Target String" oninput="updateValue(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">
+                        <p class="text-[9px] text-slate-400 px-1 italic">Maximum 16 characters.</p>
+                    </div>`;
+            } else {
+                html = `<input type="number" step="0.1" value="${appState.numericVal}" oninput="updateValue(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500">`;
+            }
+
+            inputContainer.innerHTML = html;
+            document.getElementById('labType').innerText = appState.dataType.toUpperCase() + (appState.dataType === 'ascii' ? '' : '32');
+            
+            generatePayload();
+        }
+
+        function updateValue(v) {
+            if (appState.inputType === 'toggle') {
+                appState.toggleVal = parseInt(v);
+                document.getElementById('tglOn').className = appState.toggleVal ? "flex-1 py-3 rounded-xl border-2 font-bold bg-indigo-600 border-indigo-600 text-white" : "flex-1 py-3 rounded-xl border-2 font-bold bg-white border-slate-200 text-slate-400";
+                document.getElementById('tglOff').className = !appState.toggleVal ? "flex-1 py-3 rounded-xl border-2 font-bold bg-indigo-600 border-indigo-600 text-white" : "flex-1 py-3 rounded-xl border-2 font-bold bg-white border-slate-200 text-slate-400";
+            }
+            else if (appState.inputType === 'text') appState.textVal = v;
+            else appState.numericVal = parseFloat(v) || 0;
+            
+            generatePayload();
+        }
+
+        function generatePayload() {
+            const cmdId = parseInt(appState.cmdHex, 16);
+            let dataBytes = [];
+
+            if (appState.dataType === 'float') {
+                const b = new ArrayBuffer(4);
+                const v = new DataView(b);
+                v.setFloat32(0, appState.numericVal, true); // Little Endian
+                dataBytes = [v.getUint8(0), v.getUint8(1), v.getUint8(2), v.getUint8(3)];
+            } else if (appState.dataType === 'uint') {
+                const b = new ArrayBuffer(4);
+                const v = new DataView(b);
+                v.setUint32(0, appState.inputType === 'toggle' ? appState.toggleVal : appState.numericVal, true);
+                dataBytes = [v.getUint8(0), v.getUint8(1), v.getUint8(2), v.getUint8(3)];
+            } else if (appState.dataType === 'ascii') {
+                const s = appState.textVal.substring(0, 16);
+                for(let i=0; i<s.length; i++) dataBytes.push(s.charCodeAt(i));
+                dataBytes.push(0x00); // NUL Terminator
+            }
+
+            const chk = (cmdId + dataBytes.reduce((a, b) => a + b, 0)) & 0xFF;
+            const fullFrame = [dataBytes.length + 1, cmdId, ...dataBytes, chk];
+
+            // Render Visualization
+            const container = document.getElementById('hexContainer');
+            container.innerHTML = fullFrame.map((b, i) => {
+                let cls = 'byte-data';
+                if(i === 0) cls = 'byte-len';
+                if(i === 1) cls = 'byte-cmd';
+                if(i === fullFrame.length - 1) cls = 'byte-chk';
+                return `<div class="hex-byte ${cls}">0x${b.toString(16).toUpperCase().padStart(2, '0')}</div>`;
+            }).join('');
+
+            document.getElementById('totalByteLabel').innerText = fullFrame.length + " Bytes Total";
+            document.getElementById('statLen').innerText = `0x${fullFrame[0].toString(16).toUpperCase().padStart(2, '0')}`;
+            document.getElementById('statCmd').innerText = `0x${cmdId.toString(16).toUpperCase().padStart(2, '0')}`;
+            document.getElementById('statData').innerText = dataBytes.length + " B";
+            document.getElementById('statChk').innerText = `0x${chk.toString(16).toUpperCase().padStart(2, '0')}`;
+        }
+
+        // --- Multi-Stage Chart ---
+        let chargeChart = null;
+        function initChart() {
+            if (chargeChart) return;
+            const ctx = document.getElementById('chargeChart').getContext('2d');
+            chargeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '20', '40', '60', '80', '100% SOC'],
+                    datasets: [
+                        {
+                            label: 'Voltage (V)',
+                            data: [130, 142, 149, 150, 150, 150],
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Current (A)',
+                            data: [8, 8, 8, 8, 3, 0.4],
+                            borderColor: '#10b981',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+                    scales: {
+                        y: { position: 'left', title: { display: true, text: 'Voltage', font: { size: 10 } } },
+                        y1: { position: 'right', title: { display: true, text: 'Amps', font: { size: 10 } }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        window.onload = () => {
+            initChart();
+            syncLab();
+        }
+    </script>
+</body>
+</html>

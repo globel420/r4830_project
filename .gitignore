@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+controller/backend/.venv/
+
+# Flutter / Dart build artifacts
+.dart_tool/
+.flutter-plugins-dependencies
+*.iml
+swift/.dart_tool/
+swift/build/
+swift/logs/
+swift/macos/Flutter/ephemeral/
+swift/ios/Flutter/ephemeral/
+
+# Local captures, logs, and generated archives
+bugreport/
+controller/captures/
+ble_events_*.jsonl
+ble_log_*.txt
+.capture_*.tmp
+*.zip
+
+# Local mapping snapshots
+_filemap/
+_filemap 2/
+file_tree.txt
+
+# IDE/editor state
+.idea/
+.vscode/

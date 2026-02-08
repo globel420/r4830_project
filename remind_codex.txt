@@ -1,0 +1,55 @@
+RESUME R4830
+
+1) Latest log file (JSONL):
+/Users/globel/r4830_project/swift/logs/ble_events_YYYY-MM-DD_HH-MM-SS.jsonl
+
+2) Latest text log (optional):
+/Users/globel/r4830_project/swift/logs/ble_log_YYYY-MM-DD_HH-MM-SS.txt
+
+3) What happened in real world (brief):
+- Connected? (yes/no)
+- Disconnected? (yes/no, when)
+- RX notifications seen? (yes/no)
+- Commands tried (list hex)
+
+4) Anything new learned:
+- New payloads to add
+- Any UI changes requested
+
+LOCKPOINT 2026-02-08 (DO NOT BACKTRACK WITHOUT NEW EVIDENCE)
+
+Latest validated capture:
+/Users/globel/r4830_project/controller/captures/raspi_snoop_2026-02-08_11-57-38
+
+Verified command families:
+- 0x07 output voltage setpoint
+- 0x08 output current setpoint
+- 0x0B power-on output toggle
+- 0x0C current output path (this firmware: 0=open/on, 1=close/off)
+- 0x14 self-stop
+- 0x15 power-off current
+- 0x20 two-stage switch
+- 0x21 two-stage voltage
+- 0x22 two-stage current
+- 0x23 manual control
+- 0x26 soft start time
+- 0x27 power limit watts
+- 0x2F mode toggle family
+- 0x2A language (05-frame family)
+
+Verified ACK pattern:
+- RX ACK frames are 0x03: `03 <cmd> 01 <cmd+1/checksum>`
+- Examples seen: 03210122, 03220123, 03230124, 03260127, 03270128, 032f0130, 032a012b
+
+Coverage note:
+- Latest run may not contain every opposite-state payload.
+- Historical captures include:
+  - 062f0100000030
+  - 052a7a68000c
+
+CHECKPOINT 2026-02-08T20:17:23Z
+- Hub Save Tracking added (ACK/NO_ACK/REJECTED/FAILED/UNMAPPED)
+- Last unmapped Hub save key fixed:
+  - charging_statistics_zero -> 06130000000013
+- Current rule for live validation:
+  - RX counter increasing + Save Tracking shows ACK = command path is working.

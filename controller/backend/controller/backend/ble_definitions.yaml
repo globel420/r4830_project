@@ -1,0 +1,214 @@
+version: 2
+updated_utc: "2026-02-08T20:10:00Z"
+device:
+  name: "Hou NIN R4830 CAN-BUS Touchscreen BLE Controller"
+  aliases:
+    - "ChargeFast"
+    - "go slow"
+  notes:
+    - "Observed custom 16-bit UUID services: FFE1 / FFE2 / FFE3"
+    - "Android btsnoop captures show command writes as ATT Write Command (opcode 0x52), commonly on handle 0x0006."
+
+transport:
+  tx:
+    service_uuid_16: "FFE3"
+    char_uuid_16: "FFE3"
+    properties: ["write", "write_without_response"]
+  rx:
+    service_uuid_16: "FFE2"
+    char_uuid_16: "FFE2"
+    properties: ["notify", "indicate", "read", "write", "write_without_response"]
+
+framing:
+  cmd_06:
+    pattern: "06 <cmd_id> <4-byte little-endian value> <checksum>"
+    checksum: "(cmd_id + value_byte0 + value_byte1 + value_byte2 + value_byte3) & 0xFF"
+    value_types: ["bool32le", "uint32le", "float32le"]
+  cmd_05:
+    pattern: "05 <cmd_id> <3-byte little-endian value> <checksum>"
+    checksum: "(cmd_id + value_byte0 + value_byte1 + value_byte2) & 0xFF"
+  ack_03:
+    pattern: "03 <cmd_id> <ack_status> <checksum>"
+    checksum: "(cmd_id + ack_status) & 0xFF"
+    accepted_status: 1
+
+commands:
+  output_voltage_setpoint:
+    cmd_id_hex: "07"
+    type: "float32_le"
+    unit: "V"
+    confidence: "high"
+    known_payloads:
+      - {value: 147.0, payload_hex: "0607000013435d"}
+      - {value: 149.0, payload_hex: "0607000015435f", confidence: "medium"}
+      - {value: 150.0, payload_hex: "06070000164360"}
+      - {value: 151.0, payload_hex: "06070000174361"}
+
+  output_current_setpoint:
+    cmd_id_hex: "08"
+    type: "float32_le"
+    unit: "A"
+    confidence: "high"
+    known_payloads:
+      - {value: 0.5, payload_hex: "06080000003f47"}
+      - {value: 1.0, payload_hex: "06080000803fc7"}
+    operational_notes:
+      - "At ~120V input, user guidance is to stay <= ~8A."
+      - "At ~210-220V input, higher current range is allowed."
+
+  power_on_output_toggle:
+    cmd_id_hex: "0B"
+    type: "bool32_le"
+    confidence: "high"
+    semantics:
+      open_true_payload: "060b000000000b"
+      close_false_payload: "060b010000000c"
+    notes:
+      - "Protocol polarity is inverted vs some UI labels: 0=>Open, 1=>Close."
+
+  current_output_path_toggle:
+    cmd_id_hex: "0C"
+    type: "bool32_le"
+    confidence: "high"
+    semantics:
+      open_on_payload: "060c000000000c"
+      close_off_payload: "060c010000000d"
+    notes:
+      - "Current firmware behavior confirmed in live captures: 0=>Open/On, 1=>Close/Off."
+
+  self_stop_toggle:
+    cmd_id_hex: "14"
+    type: "bool32_le"
+    confidence: "high"
+    semantics:
+      off_payload: "06140000000014"
+      on_payload: "06140100000015"
+
+  power_off_current:
+    cmd_id_hex: "15"
+    type: "float32_le"
+    unit: "A"
+    confidence: "high"
+    known_payloads:
+      - {value: 0.1, payload_hex: "0615cdcccc3db7"}
+      - {value: 0.2, payload_hex: "0615cdcc4c3e38"}
+      - {value: 0.3, payload_hex: "06159a99993e1f"}
+      - {value: 0.4, payload_hex: "0615cdcccc3eb8"}
+      - {value: 1.0, payload_hex: "06150000803fd4"}
+      - {value: 5.0, payload_hex: "06150000a040f5"}
+      - {value: 8.0, payload_hex: "06150000004156"}
+      - {value: 9.0, payload_hex: "06150000104166"}
+      - {value: 10.0, payload_hex: "06150000204176"}
+      - {value: 11.0, payload_hex: "06150000304186"}
+      - {value: 16.0, payload_hex: "061500008041d6"}
+      - {value: 20.0, payload_hex: "06150000a041f6"}
+      - {value: 225.0, payload_hex: "061500006143b9"}
+    notes:
+      - "No strict upper clamp was observed in OEM UI/capture workflow."
+
+  two_stage_switch:
+    cmd_id_hex: "20"
+    type: "bool32_le"
+    confidence: "high"
+    semantics:
+      off_payload: "06200000000020"
+      on_payload: "06200100000021"
+
+  two_stage_voltage:
+    cmd_id_hex: "21"
+    type: "float32_le"
+    unit: "V"
+    confidence: "high"
+    known_payloads:
+      - {value: 146.0, payload_hex: "06210000124376"}
+      - {value: 148.5, payload_hex: "062100801443f8"}
+      - {value: 149.0, payload_hex: "06210000154379"}
+      - {value: 150.0, payload_hex: "0621000016437a", confidence: "historical"}
+      - {value: 151.0, payload_hex: "0621000017437b", confidence: "historical"}
+
+  two_stage_current:
+    cmd_id_hex: "22"
+    type: "float32_le"
+    unit: "A"
+    confidence: "high"
+    known_payloads:
+      - {value: 0.5, payload_hex: "06220000003f61"}
+      - {value: 0.8, payload_hex: "0622cdcc4c3f46"}
+      - {value: 1.0, payload_hex: "06220000803fe1"}
+      - {value: 3.0, payload_hex: "062200004040a2"}
+
+  manual_output_toggle:
+    cmd_id_hex: "23"
+    type: "bool32_le"
+    confidence: "high"
+    semantics:
+      close_payload: "06230000000023"
+      open_payload: "06230100000024"
+
+  soft_start_time:
+    cmd_id_hex: "26"
+    type: "uint32_le"
+    unit: "s"
+    confidence: "high"
+    known_payloads:
+      - {value: 1, payload_hex: "06260100000027"}
+      - {value: 5, payload_hex: "0626050000002b"}
+      - {value: 8, payload_hex: "0626080000002e"}
+
+  power_limit_watts:
+    cmd_id_hex: "27"
+    type: "uint32_le"
+    unit: "W"
+    confidence: "high"
+    known_payloads:
+      - {value: 1000, payload_hex: "0627e803000012"}
+      - {value: 1500, payload_hex: "0627dc05000008"}
+      - {value: 2000, payload_hex: "0627d0070000fe"}
+
+  equal_distribution_mode:
+    cmd_id_hex: "2F"
+    type: "bool32_le"
+    confidence: "high"
+    semantics:
+      intelligent_payload: "062f000000002f"
+      equal_distribution_payload: "062f0100000030"
+
+  display_language:
+    cmd_id_hex: "2A"
+    frame_type: "05"
+    type: "ascii_2char_le"
+    confidence: "high"
+    known_payloads:
+      - {value: "English", payload_hex: "052a656e00fd"}
+      - {value: "Chinese", payload_hex: "052a7a68000c"}
+
+  rename_charger:
+    cmd_id_hex: "1E"
+    frame_type: "len_prefixed_ascii"
+    confidence: "medium"
+    known_payloads:
+      - {value: "go slow", payload_hex: "0a1e676f20736c6f7700d9"}
+      - {value: "ChargeFast", payload_hex: "0d1e4368617267654661737400f6"}
+
+acks:
+  confirmed:
+    - "03070108"
+    - "03080109"
+    - "030b010c"
+    - "030c010d"
+    - "03140115"
+    - "03150116"
+    - "03200121"
+    - "03210122"
+    - "03220123"
+    - "03230124"
+    - "03260127"
+    - "03270128"
+    - "032a012b"
+    - "032f0130"
+
+auth_and_password:
+  status: "not_fully_decoded"
+  notes:
+    - "Password/login/change generates longer frames (23../4a03../41.. families)."
+    - "Keep capturing with isolated single-variable tests before semantic labeling."

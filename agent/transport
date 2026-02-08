@@ -1,0 +1,13 @@
+transport:
+  service_uuids:
+    - "0000FFE0-0000-1000-8000-00805F9B34FB"   # optional container service if you later confirm
+  characteristics:
+    tx:
+      uuid: "0000FFE3-0000-1000-8000-00805F9B34FB"
+      write_type: "write_without_response"      # "write" or "write_without_response"
+    rx:
+      uuid: "0000FFE2-0000-1000-8000-00805F9B34FB"
+      notify: true
+      indicate: false                           # set true if required
+      read_on_connect: false                    # optional
+  att_write_handle_hint: "0x0006"               # optional, from captures (not portable across OS stacks)

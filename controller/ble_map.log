@@ -1,0 +1,191 @@
+
+============================================================
+TIMESTAMP: 2026-02-06_03-27-16
+LABEL:     nothing
+ZIP:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-27-16/bugreport_2026-02-06_03-27-16.zip
+LOG:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-27-16/unzipped/FS/data/log/bt/btsnoop_hci.log
+LOG_MTIME: Feb  6 03:28:00 2026
+LOG_SIZE:  22684
+============================================================
+
+No btatt.opcode==0x52 frames found in this capture.
+
+============================================================
+TIMESTAMP: 2026-02-06_03-31-41
+LABEL:     loged in with the blank password
+ZIP:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-31-41/bugreport_2026-02-06_03-31-41.zip
+LOG:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-31-41/unzipped/FS/data/log/bt/btsnoop_hci.log
+LOG_MTIME: Feb  6 03:32:24 2026
+LOG_SIZE:  92463
+============================================================
+
+
+---- UNIQUE PAYLOADS (ALL) opcode=0x52 ----
+  62 020606
+   2 2302413036434134423442453943303731304644
+   2 4132324331413537453233313130002e
+   1 2302334338383544444642304539344343413532
+   1 32373637323637364246453436410060
+   1 2302314131444339314339303733323543363932
+   1 3731444446304339343442433732002f
+   1 2302443431443843443938463030423230344539
+   1 38303039393845434638343237450045
+   1 020101
+   1 020404
+   1 020505
+
+---- UNIQUE PAYLOADS (COMMAND-LIKE: starts with 06..) opcode=0x52 ----
+(none)
+
+---- HANDLES SEEN FOR 06.. (for reference only; not required) ----
+(none)
+
+---- TIMELINE (06.. only) opcode=0x52 ----
+(none)
+
+============================================================
+TIMESTAMP: 2026-02-06_03-34-07
+LABEL:     baseline
+ZIP:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-34-07/bugreport_2026-02-06_03-34-07.zip
+LOG:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-34-07/unzipped/FS/data/log/bt/btsnoop_hci.log
+LOG_MTIME: Feb  6 03:34:50 2026
+LOG_SIZE:  113234
+============================================================
+
+
+---- UNIQUE PAYLOADS (ALL) opcode=0x52 ----
+ 111 020606
+   2 2302413036434134423442453943303731304644
+   2 4132324331413537453233313130002e
+   1 2302334338383544444642304539344343413532
+   1 32373637323637364246453436410060
+   1 2302314131444339314339303733323543363932
+   1 3731444446304339343442433732002f
+   1 2302443431443843443938463030423230344539
+   1 38303039393845434638343237450045
+   1 020101
+   1 020404
+   1 020505
+
+---- UNIQUE PAYLOADS (COMMAND-LIKE: starts with 06..) opcode=0x52 ----
+(none)
+
+---- HANDLES SEEN FOR 06.. (for reference only; not required) ----
+(none)
+
+---- TIMELINE (06.. only) opcode=0x52 ----
+(none)
+
+============================================================
+TIMESTAMP: 2026-02-06_03-36-31
+LABEL:     current closed base line (input 123.3 +- .3 volts) input Hz 60Hz temp is 2525.8c temprature settings is 2? statistics is .10Ah 14.16Wh)
+ZIP:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-36-31/bugreport_2026-02-06_03-36-31.zip
+LOG:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-36-31/unzipped/FS/data/log/bt/btsnoop_hci.log
+LOG_MTIME: Feb  6 03:40:00 2026
+LOG_SIZE:  189346
+============================================================
+
+
+---- UNIQUE PAYLOADS (ALL) opcode=0x52 ----
+ 368 020606
+   2 2302413036434134423442453943303731304644
+   2 4132324331413537453233313130002e
+   1 2302334338383544444642304539344343413532
+   1 32373637323637364246453436410060
+   1 2302314131444339314339303733323543363932
+   1 3731444446304339343442433732002f
+   1 2302443431443843443938463030423230344539
+   1 38303039393845434638343237450045
+   1 020101
+   1 020404
+   1 020505
+   1 060c010000000d
+   1 060c000000000c
+
+---- UNIQUE PAYLOADS (COMMAND-LIKE: starts with 06..) opcode=0x52 ----
+   1 060c010000000d
+   1 060c000000000c
+
+---- HANDLES SEEN FOR 06.. (for reference only; not required) ----
+   2 0x0006
+
+---- TIMELINE (06.. only) opcode=0x52 ----
+508.033763	0x0006	060c010000000d
+804.635773	0x0006	060c000000000c
+
+============================================================
+TIMESTAMP: 2026-02-06_03-41-17
+LABEL:     (current out put open) input current is at 1.29 +/- .2 Output current .95A efficiency is 88.3% throttling point is 98 % +/- 20% temprature 28.5c tempt 2 is 26c
+ZIP:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-41-17/bugreport_2026-02-06_03-41-17.zip
+LOG:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-41-17/unzipped/FS/data/log/bt/btsnoop_hci.log
+LOG_MTIME: Feb  6 03:45:10 2026
+LOG_SIZE:  272726
+============================================================
+
+
+---- UNIQUE PAYLOADS (ALL) opcode=0x52 ----
+ 636 020606
+   2 2302413036434134423442453943303731304644
+   2 4132324331413537453233313130002e
+   1 2302334338383544444642304539344343413532
+   1 32373637323637364246453436410060
+   1 2302314131444339314339303733323543363932
+   1 3731444446304339343442433732002f
+   1 2302443431443843443938463030423230344539
+   1 38303039393845434638343237450045
+   1 020101
+   1 020404
+   1 020505
+   1 060c010000000d
+   1 060c000000000c
+
+---- UNIQUE PAYLOADS (COMMAND-LIKE: starts with 06..) opcode=0x52 ----
+   1 060c010000000d
+   1 060c000000000c
+
+---- HANDLES SEEN FOR 06.. (for reference only; not required) ----
+   2 0x0006
+
+---- TIMELINE (06.. only) opcode=0x52 ----
+508.033763	0x0006	060c010000000d
+804.635773	0x0006	060c000000000c
+
+============================================================
+TIMESTAMP: 2026-02-06_03-46-28
+LABEL:     zeroed
+ZIP:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-46-28/bugreport_2026-02-06_03-46-28.zip
+LOG:       /Users/globel/r4830_project/controller/captures/cap_2026-02-06_03-46-28/unzipped/FS/data/log/bt/btsnoop_hci.log
+LOG_MTIME: Feb  6 03:47:18 2026
+LOG_SIZE:  300941
+============================================================
+
+
+---- UNIQUE PAYLOADS (ALL) opcode=0x52 ----
+ 755 020606
+   2 2302413036434134423442453943303731304644
+   2 4132324331413537453233313130002e
+   1 2302334338383544444642304539344343413532
+   1 32373637323637364246453436410060
+   1 2302314131444339314339303733323543363932
+   1 3731444446304339343442433732002f
+   1 2302443431443843443938463030423230344539
+   1 38303039393845434638343237450045
+   1 020101
+   1 020404
+   1 020505
+   1 060c010000000d
+   1 060c000000000c
+   1 06130000000013
+
+---- UNIQUE PAYLOADS (COMMAND-LIKE: starts with 06..) opcode=0x52 ----
+   1 060c010000000d
+   1 060c000000000c
+   1 06130000000013
+
+---- HANDLES SEEN FOR 06.. (for reference only; not required) ----
+   3 0x0006
+
+---- TIMELINE (06.. only) opcode=0x52 ----
+508.033763	0x0006	060c010000000d
+804.635773	0x0006	060c000000000c
+1188.487868	0x0006	06130000000013

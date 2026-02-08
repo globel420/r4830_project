@@ -1,0 +1,11 @@
+telemetry:
+  enabled: true
+  source: "rx_notify"               # "rx_notify" or "rx_indicate"
+  decode: "raw_hex"                 # "raw_hex" | "custom_v1" | "none"
+  poll:
+    enabled: false
+    interval_ms: 1000
+    command_keys: []                # list of command keys to send as poll requests
+  fields: []                        # optional list of known decoded fields (future)
+  notes:
+    - "Initial implementation logs raw RX frames and timestamps."

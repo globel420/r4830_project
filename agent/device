@@ -1,0 +1,6 @@
+device:
+  name_contains: ["ChargeFast", "go slow"]   # any match
+  preferred_name: "ChargeFast"              # for UI display
+  manufacturer_id: "0x6666"                 # optional
+  manufacturer_data_prefix_hex: ""          # optional (if you later identify a stable prefix)
+  rssi_min: -95                             # optional scan filter

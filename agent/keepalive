@@ -1,0 +1,6 @@
+keepalive:
+  enabled: true
+  payload_hex: "020606"
+  interval_ms: 1500                 # start conservative; adjust once proven stable
+  send_via: "tx"                    # "tx" or "rx" if the device expects it elsewhere
+  notes: "Observed hundreds/thousands of times per session in captures; likely required."

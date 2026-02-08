@@ -1,0 +1,8 @@
+meta:
+  schema_version: "1.0"
+  project: "r48xx_chargefast_controller"
+  generated_by: "manual reverse engineering via btsnoop_hci + tshark"
+  last_updated: "2026-02-05"
+  notes:
+    - "All command payloads are captured from OEM app traffic and replayed."
+    - "Do not infer protocol fields unless proven by isolated capture tests."

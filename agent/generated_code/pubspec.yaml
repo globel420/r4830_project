@@ -1,0 +1,33 @@
+name: chargefast_controller_app
+description: A new Flutter project to control the ChargeFast BLE device.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  flutter_blue_plus: ^1.14.15
+  
+  yaml: ^3.1.2
+  
+  flutter_riverpod: ^2.4.9
+
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/ble_definitions.yaml
