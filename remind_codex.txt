@@ -77,3 +77,14 @@ CHECKPOINT 2026-02-08T20:42:00Z
   - Chinese (Traditional, candidate)
 - Added candidate `0x2A` frame for traditional Chinese:
   - 052a7a740018
+
+CHECKPOINT 2026-02-08T20:50:00Z
+- Flutter Hub labels cleaned up to natural English terms.
+- Password flow update:
+  - current/original password is optional now
+  - if provided, auth chunks are sent before password save
+- ACK extraction expanded to include len-prefixed name/password frames.
+- Flutter language options now include:
+  - English
+  - Chinese (Simplified)
+  - Chinese (Traditional)

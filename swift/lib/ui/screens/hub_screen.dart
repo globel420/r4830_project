@@ -266,7 +266,7 @@ class _HubScreenState extends State<HubScreen>
           _sectionHeader('Settings'),
           _statsRow(),
           _numericSettingRow(
-            label: 'Current Voltage',
+            label: 'Output Voltage Setpoint',
             currentText:
                 '(${_fmtNum(telemetry.outputSetVoltage, unit: 'V', fallback: '--')})',
             controller: _outputVoltageController,
@@ -274,7 +274,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'output_current_voltage',
           ),
           _numericSettingRow(
-            label: 'Current',
+            label: 'Output Current Limit',
             currentText:
                 '(${_fmtNum(telemetry.outputSetCurrent, unit: 'A', fallback: '--')})',
             controller: _outputCurrentController,
@@ -296,13 +296,16 @@ class _HubScreenState extends State<HubScreen>
     final twoStageValue = _twoStageLocal ?? _twoStage;
     final manualControlValue = _manualControlLocal ?? _manualControl;
 
-    final powerOnOutputCurrent = _labelBoolReported(powerOnOutputReported);
-    final selfStopCurrent = _labelBool(telemetry.selfStop, fallback: _selfStop);
-    final twoStageCurrent = _labelBool(
+    final powerOnOutputCurrent = _labelOpenCloseReported(powerOnOutputReported);
+    final selfStopCurrent = _labelOnOff(
+      telemetry.selfStop,
+      fallback: _selfStop,
+    );
+    final twoStageCurrent = _labelOnOff(
       telemetry.twoStageEnabled,
       fallback: _twoStage,
     );
-    final manualControlCurrent = _labelBool(
+    final manualControlCurrent = _labelOnOff(
       telemetry.manualControl,
       fallback: _manualControl,
     );
@@ -319,7 +322,7 @@ class _HubScreenState extends State<HubScreen>
         padding: EdgeInsets.zero,
         children: [
           _toggleSettingRow(
-            label: 'Power-on output',
+            label: 'Power-On Output State',
             currentText: powerOnOutputCurrent,
             value: powerOnOutputValue,
             onChanged: (v) => setState(() {
@@ -328,7 +331,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'power_on_output',
           ),
           _toggleSettingRow(
-            label: 'Full of self-stop',
+            label: 'Auto Stop (Full)',
             currentText: selfStopCurrent,
             value: selfStopValue,
             onChanged: (v) => setState(() {
@@ -337,7 +340,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'self_stop',
           ),
           _numericSettingRow(
-            label: 'Power-off current',
+            label: 'Power-Off Current',
             currentText:
                 '(${_fmtNum(telemetry.powerOffCurrent, unit: 'A', fallback: '--')})',
             controller: _powerOffCurrentController,
@@ -345,7 +348,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'power_off_current',
           ),
           _toggleSettingRow(
-            label: 'Two-stage switch',
+            label: 'Two-Stage Charging',
             currentText: twoStageCurrent,
             value: twoStageValue,
             onChanged: (v) => setState(() {
@@ -354,7 +357,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'two_stage_switch',
           ),
           _numericSettingRow(
-            label: 'Second-stage voltage',
+            label: 'Stage 2 Voltage',
             currentText:
                 '(${_fmtNum(telemetry.stage2Voltage, unit: 'V', fallback: '--')})',
             controller: _secondStageVoltageController,
@@ -362,7 +365,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'second_stage_voltage',
           ),
           _numericSettingRow(
-            label: 'Second-stage current',
+            label: 'Stage 2 Current',
             currentText:
                 '(${_fmtNum(telemetry.stage2Current, unit: 'A', fallback: '--')})',
             controller: _secondStageCurrentController,
@@ -370,7 +373,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'second_stage_current',
           ),
           _selectSettingRow(
-            label: 'Multi-motor current',
+            label: 'Multi-Motor Control Mode',
             currentText: '($multiMotorCurrent)',
             value: _multiMotorMode,
             options: const ['Intelligent Control', 'Equal Distribution'],
@@ -378,7 +381,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'multi_motor_current_mode',
           ),
           _toggleSettingRow(
-            label: 'Manual control',
+            label: 'Manual Output Control',
             currentText: manualControlCurrent,
             value: manualControlValue,
             onChanged: (v) => setState(() {
@@ -387,7 +390,7 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'manual_control',
           ),
           _numericSettingRow(
-            label: 'Soft start time',
+            label: 'Soft Start Time',
             currentText:
                 '(${_fmtInt(telemetry.softStartSeconds, unit: 'S', fallback: '--')})',
             controller: _softStartController,
@@ -405,7 +408,11 @@ class _HubScreenState extends State<HubScreen>
             label: 'Display language',
             currentText: '($displayLanguageCurrent)',
             value: _displayLanguage,
-            options: const ['English', 'Chinese'],
+            options: const [
+              'English',
+              'Chinese (Simplified)',
+              'Chinese (Traditional)',
+            ],
             onChanged: (v) => setState(() => _displayLanguage = v),
             saveKey: 'display_language',
           ),
@@ -432,10 +439,7 @@ class _HubScreenState extends State<HubScreen>
                   flex: 4,
                   child: Padding(
                     padding: EdgeInsets.only(left: 4),
-                    child: Text(
-                      'Bluetooth\nName',
-                      style: TextStyle(fontSize: 19),
-                    ),
+                    child: Text('Device\nName', style: TextStyle(fontSize: 19)),
                   ),
                 ),
                 Expanded(
@@ -476,20 +480,20 @@ class _HubScreenState extends State<HubScreen>
             color: Colors.white,
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 2),
             child: const Text(
-              'Change Password',
+              'Set BLE Password',
               style: TextStyle(fontSize: 23),
             ),
           ),
           _safetyPasswordField(
-            label: 'Original password',
+            label: 'Current Password (optional)',
             controller: _originalPasswordController,
           ),
           _safetyPasswordField(
-            label: 'New password',
+            label: 'New Password',
             controller: _newPasswordController,
           ),
           _safetyPasswordField(
-            label: 'Confirm new password',
+            label: 'Confirm New Password',
             controller: _confirmPasswordController,
           ),
           Container(
@@ -506,7 +510,7 @@ class _HubScreenState extends State<HubScreen>
                 ),
                 onPressed: _changePassword,
                 child: const Text(
-                  'Change Password',
+                  'Save Password',
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -516,7 +520,7 @@ class _HubScreenState extends State<HubScreen>
             color: Colors.white,
             padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
             child: const Text(
-              'Friendly reminder: Be sure to remember your password, once you forget it, it cannot be reset.',
+              'Remember this password. If it is lost, recovery may not be possible.',
               style: TextStyle(fontSize: 16, color: _valueBlue),
             ),
           ),
@@ -607,7 +611,7 @@ class _HubScreenState extends State<HubScreen>
         children: [
           const Expanded(
             flex: 3,
-            child: Text('Charging Statistics', style: TextStyle(fontSize: 16)),
+            child: Text('Charge Statistics', style: TextStyle(fontSize: 16)),
           ),
           const Expanded(
             flex: 2,
@@ -626,7 +630,7 @@ class _HubScreenState extends State<HubScreen>
           SizedBox(
             width: 110,
             child: _saveButton(
-              text: 'Zeroing',
+              text: 'Reset',
               onPressed: () => _saved('charging_statistics_zero'),
             ),
           ),
@@ -800,8 +804,8 @@ class _HubScreenState extends State<HubScreen>
           Expanded(
             flex: 5,
             child: _labelBlock(
-              label: 'Current output',
-              currentText: enabled ? '(Open)' : '(Close)',
+              label: 'Output Enable',
+              currentText: enabled ? '(Enabled)' : '(Disabled)',
             ),
           ),
           Expanded(
@@ -823,7 +827,7 @@ class _HubScreenState extends State<HubScreen>
                   await _saved(next ? 'output_on' : 'output_off');
                 },
                 child: Text(
-                  enabled ? 'Turn off output' : 'Turn on output',
+                  enabled ? 'Disable Output' : 'Enable Output',
                   style: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -880,17 +884,17 @@ class _HubScreenState extends State<HubScreen>
     final next = _newPasswordController.text.trim();
     final confirm = _confirmPasswordController.text.trim();
 
-    if (original.isEmpty || next.isEmpty || confirm.isEmpty) {
-      _showMessage('Fill original, new, and confirm password fields.');
+    if (next.isEmpty || confirm.isEmpty) {
+      _showMessage('Fill new and confirm password fields.');
       return;
     }
     if (next != confirm) {
       _showMessage('New password and confirm password do not match.');
       return;
     }
-    if (next.length < 4) {
-      _showMessage('Password must be at least 4 characters.');
-      return;
+    if (original.isNotEmpty) {
+      await context.read<BleController>().sendAuthPassword(original);
+      await Future<void>.delayed(const Duration(milliseconds: 60));
     }
     await _saved('safety_change_password');
   }
@@ -1230,6 +1234,10 @@ class _HubScreenState extends State<HubScreen>
     final frameType = bytes.first;
     if (frameType == 0x06 && bytes.length == 7) return bytes[1];
     if (frameType == 0x05 && bytes.length == 6) return bytes[1];
+    // Len-prefixed ASCII frames (e.g. rename 0x1e, set password 0x1b).
+    if (bytes.length >= 4 && bytes.first == bytes.length - 1) {
+      return bytes[1];
+    }
     return null;
   }
 
@@ -1249,12 +1257,12 @@ class _HubScreenState extends State<HubScreen>
     return '$value$unit';
   }
 
-  String _labelBool(bool? value, {required bool fallback}) {
+  String _labelOnOff(bool? value, {required bool fallback}) {
     final effective = value ?? fallback;
-    return effective ? '(Open)' : '(Close)';
+    return effective ? '(On)' : '(Off)';
   }
 
-  String _labelBoolReported(bool? value) {
+  String _labelOpenCloseReported(bool? value) {
     if (value == null) return '(--)';
     return value ? '(Open)' : '(Close)';
   }

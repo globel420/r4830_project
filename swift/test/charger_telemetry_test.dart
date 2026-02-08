@@ -56,6 +56,25 @@ void main() {
     expect(telemetry.displayLanguage, 'English');
   });
 
+  test('decodes traditional Chinese display language from frame05', () {
+    final logs = [
+      BleLogEntry(
+        timestamp: DateTime.parse('2026-02-07T12:01:00Z'),
+        direction: 'RX',
+        hex: '052a7a740018',
+        decoded: {
+          'frame_type': '0x05',
+          'cmd_id': 0x2a,
+          'u8_02': 0x7a,
+          'u8_03': 0x74,
+        },
+      ),
+    ];
+
+    final telemetry = ChargerTelemetryState.fromLogs(logs);
+    expect(telemetry.displayLanguage, 'Chinese (Traditional)');
+  });
+
   test('extracts telemetry from long OEM 3006/6905 frames', () {
     BleLogEntry rxEntry(DateTime ts, String hex) {
       final bytes = hexToBytes(hex)!;

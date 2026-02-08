@@ -180,7 +180,8 @@ commands:
     confidence: "high"
     known_payloads:
       - {value: "English", payload_hex: "052a656e00fd"}
-      - {value: "Chinese", payload_hex: "052a7a68000c"}
+      - {value: "Chinese (Simplified)", payload_hex: "052a7a68000c"}
+      - {value: "Chinese (Traditional, candidate)", payload_hex: "052a7a740018"}
 
   rename_charger:
     cmd_id_hex: "1E"

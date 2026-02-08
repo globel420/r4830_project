@@ -167,12 +167,25 @@ class OemCommandMapper {
 
   static CommandMappingResult displayLanguage(String value) {
     final normalized = value.toLowerCase().trim();
-    if (normalized == 'chinese') {
+    if (normalized == 'chinese (traditional)' ||
+        normalized == 'traditional chinese' ||
+        normalized == 'chinese traditional') {
+      final bytes = buildFrame05FromBytes(0x2a, const [0x7a, 0x74, 0x00]);
+      return CommandMappingResult(
+        payloadHex: bytesToHex(bytes),
+        confidence: CommandConfidence.candidate,
+        label: 'display_language_chinese_traditional_candidate',
+      );
+    }
+    if (normalized == 'chinese' ||
+        normalized == 'chinese (simplified)' ||
+        normalized == 'simplified chinese' ||
+        normalized == 'chinese simplified') {
       final bytes = buildFrame05FromBytes(0x2a, const [0x7a, 0x68, 0x00]);
       return CommandMappingResult(
         payloadHex: bytesToHex(bytes),
         confidence: CommandConfidence.candidate,
-        label: 'display_language_chinese_candidate',
+        label: 'display_language_chinese_simplified_candidate',
       );
     }
     final bytes = buildFrame05FromBytes(0x2a, const [0x65, 0x6e, 0x00]);

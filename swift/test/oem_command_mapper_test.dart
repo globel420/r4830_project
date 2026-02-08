@@ -62,9 +62,15 @@ void main() {
 
   test('display language maps to expected frame05 payloads', () {
     final english = OemCommandMapper.displayLanguage('English');
-    final chinese = OemCommandMapper.displayLanguage('Chinese');
+    final chineseSimplified = OemCommandMapper.displayLanguage(
+      'Chinese (Simplified)',
+    );
+    final chineseTraditional = OemCommandMapper.displayLanguage(
+      'Chinese (Traditional)',
+    );
     expect(english.payloadHex, '052a656e00fd');
-    expect(chinese.payloadHex, '052a7a68000c');
+    expect(chineseSimplified.payloadHex, '052a7a68000c');
+    expect(chineseTraditional.payloadHex, '052a7a740018');
     expect(english.confidence, CommandConfidence.candidate);
   });
 

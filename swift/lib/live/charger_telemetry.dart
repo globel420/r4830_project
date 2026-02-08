@@ -169,11 +169,7 @@ class ChargerTelemetryState {
         if (displayLanguage == null) {
           final lang0 = _u8At(decoded, 93);
           final lang1 = _u8At(decoded, 94);
-          if (lang0 == 0x65 && lang1 == 0x6e) {
-            displayLanguage = 'English';
-          } else if (lang0 == 0x7a && lang1 == 0x68) {
-            displayLanguage = 'Chinese';
-          }
+          displayLanguage = _languageFromCode(lang0, lang1) ?? displayLanguage;
         }
       }
 
@@ -182,11 +178,7 @@ class ChargerTelemetryState {
         if (cmd == 0x2a && displayLanguage == null) {
           final b2 = _asInt(decoded['u8_02']);
           final b3 = _asInt(decoded['u8_03']);
-          if (b2 == 0x65 && b3 == 0x6e) {
-            displayLanguage = 'English';
-          } else if (b2 == 0x7a && b3 == 0x68) {
-            displayLanguage = 'Chinese';
-          }
+          displayLanguage = _languageFromCode(b2, b3) ?? displayLanguage;
         }
       }
 
@@ -329,5 +321,12 @@ class ChargerTelemetryState {
     }
     if (bytes.isEmpty) return null;
     return String.fromCharCodes(bytes);
+  }
+
+  static String? _languageFromCode(int? b0, int? b1) {
+    if (b0 == 0x65 && b1 == 0x6e) return 'English';
+    if (b0 == 0x7a && b1 == 0x68) return 'Chinese (Simplified)';
+    if (b0 == 0x7a && b1 == 0x74) return 'Chinese (Traditional)';
+    return null;
   }
 }

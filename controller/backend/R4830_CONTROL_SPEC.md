@@ -25,7 +25,7 @@ This file is the concise working spec for command generation and save/replay.
 | Soft start time | `0x26` | `u32le` | `1 -> 06260100000027`, `5 -> 0626050000002b`, `8 -> 0626080000002e` |
 | Power limit | `0x27` | `u32le` | `1000 -> 0627e803000012`, `1500 -> 0627dc05000008`, `2000 -> 0627d0070000fe` |
 | Equal distribution | `0x2F` | `bool32le` | `off -> 062f000000002f`, `on -> 062f0100000030` |
-| Display language | `0x2A` | `frame05` | `English -> 052a656e00fd`, `Chinese -> 052a7a68000c` |
+| Display language | `0x2A` | `frame05` | `English -> 052a656e00fd`, `Chinese (Simplified) -> 052a7a68000c`, `Chinese (Traditional, candidate) -> 052a7a740018` |
 
 ## Ack Pattern (RX)
 
