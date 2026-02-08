@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>R4830 Web Controller</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+    <main class="shell">
+      <header class="hero card">
+        <div>
+          <h1>R4830 Web Controller</h1>
+          <p>
+            Desktop-browser BLE control and decode console for ChargeFast /
+            R4830.
+          </p>
+        </div>
+        <div class="status-wrap">
+          <span id="status-pill" class="pill offline">Disconnected</span>
+          <span id="device-pill" class="pill muted">No device</span>
+        </div>
+      </header>
+
+      <section class="card">
+        <h2>Connection</h2>
+        <div class="toolbar">
+          <button id="connect-btn" class="btn btn-primary">Connect BLE</button>
+          <button id="disconnect-btn" class="btn btn-muted">Disconnect</button>
+          <button id="discover-btn" class="btn btn-muted">
+            Rediscover Services
+          </button>
+        </div>
+        <div class="info-grid mono">
+          <div><span>RX UUID:</span> <strong id="rx-uuid">-</strong></div>
+          <div><span>TX UUID:</span> <strong id="tx-uuid">-</strong></div>
+          <div><span>RX Count:</span> <strong id="rx-count">0</strong></div>
+          <div><span>TX Count:</span> <strong id="tx-count">0</strong></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Quick Actions</h2>
+        <div class="grid grid-4">
+          <button class="btn" data-action="output_on">Current Output ON</button>
+          <button class="btn" data-action="output_off">
+            Current Output OFF
+          </button>
+          <button class="btn" data-action="manual_open">Manual Open</button>
+          <button class="btn" data-action="manual_close">Manual Close</button>
+          <button class="btn" data-action="keepalive_once">Keepalive Once</button>
+          <button class="btn" data-action="charging_stats_zero">
+            Charging Stats Zero
+          </button>
+        </div>
+        <div class="toolbar compact">
+          <label class="inline">
+            <input type="checkbox" id="keepalive-enabled" />
+            keepalive loop
+          </label>
+          <label class="inline">
+            interval ms
+            <input id="keepalive-ms" type="number" min="200" step="100" value="1000" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Setpoints</h2>
+        <div class="grid grid-3">
+          <label>
+            Output Voltage (V)
+            <input id="set-voltage" type="number" step="0.1" value="149.0" />
+          </label>
+          <label>
+            Output Current (A)
+            <input id="set-current" type="number" step="0.1" value="0.5" />
+          </label>
+          <div class="actions">
+            <button class="btn" data-action="set_output_voltage">Save Voltage</button>
+            <button class="btn" data-action="set_output_current">Save Current</button>
+          </div>
+
+          <label>
+            Power-Off Current (A)
+            <input id="power-off-current" type="number" step="0.1" value="0.3" />
+          </label>
+          <label>
+            Stage2 Voltage (V)
+            <input id="stage2-voltage" type="number" step="0.1" value="150.0" />
+          </label>
+          <label>
+            Stage2 Current (A)
+            <input id="stage2-current" type="number" step="0.1" value="0.8" />
+          </label>
+
+          <div class="actions">
+            <button class="btn" data-action="set_power_off_current">
+              Save Power-Off Current
+            </button>
+            <button class="btn" data-action="set_stage2_voltage">
+              Save Stage2 Voltage
+            </button>
+            <button class="btn" data-action="set_stage2_current">
+              Save Stage2 Current
+            </button>
+          </div>
+
+          <label>
+            Soft Start (s)
+            <input id="soft-start" type="number" step="1" min="0" value="8" />
+          </label>
+          <label>
+            Power Limit (W)
+            <input id="power-limit" type="number" step="1" min="1" value="1500" />
+          </label>
+          <div class="actions">
+            <button class="btn" data-action="set_soft_start">Save Soft Start</button>
+            <button class="btn" data-action="set_power_limit">Save Power Limit</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Toggles and Modes</h2>
+        <div class="grid grid-4">
+          <label>
+            Power-On Output
+            <select id="power-on-output">
+              <option value="open">Open</option>
+              <option value="close">Close</option>
+            </select>
+          </label>
+          <label>
+            Self-Stop
+            <select id="self-stop">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+            </select>
+          </label>
+          <label>
+            Two-Stage Switch
+            <select id="two-stage">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+            </select>
+          </label>
+          <label>
+            Multi Motor Mode
+            <select id="multi-motor">
+              <option value="intelligent">Intelligent Control</option>
+              <option value="equal">Equal Distribution</option>
+            </select>
+          </label>
+        </div>
+        <div class="toolbar">
+          <button class="btn" data-action="save_power_on_output">
+            Save Power-On Output
+          </button>
+          <button class="btn" data-action="save_self_stop">Save Self-Stop</button>
+          <button class="btn" data-action="save_two_stage">Save Two-Stage</button>
+          <button class="btn" data-action="save_multi_motor">
+            Save Multi Motor Mode
+          </button>
+        </div>
+        <div class="toolbar">
+          <label>
+            Language
+            <select id="display-language">
+              <option value="english">English</option>
+              <option value="chinese">Chinese</option>
+            </select>
+          </label>
+          <button class="btn" data-action="save_language">Save Language</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Raw TX</h2>
+        <div class="toolbar">
+          <input
+            id="raw-hex"
+            class="mono"
+            type="text"
+            placeholder="Example: 0627dc05000008"
+          />
+          <button id="send-raw-btn" class="btn btn-primary">Send Raw Hex</button>
+        </div>
+        <p class="hint mono">
+          Hex accepts spaces/colons. For 0x06/0x05 frames, ACK waiting is automatic.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Telemetry Summary</h2>
+        <div id="telemetry-grid" class="info-grid mono">
+          <div>Input V: <strong id="tm-input-v">-</strong></div>
+          <div>Input A: <strong id="tm-input-a">-</strong></div>
+          <div>Output V: <strong id="tm-output-v">-</strong></div>
+          <div>Output A: <strong id="tm-output-a">-</strong></div>
+          <div>Output Set V: <strong id="tm-set-v">-</strong></div>
+          <div>Output Set A: <strong id="tm-set-a">-</strong></div>
+          <div>Stage2 V: <strong id="tm-stage2-v">-</strong></div>
+          <div>Stage2 A: <strong id="tm-stage2-a">-</strong></div>
+          <div>Power-Off A: <strong id="tm-poweroff-a">-</strong></div>
+          <div>Soft Start: <strong id="tm-soft-start">-</strong></div>
+          <div>Two Stage: <strong id="tm-two-stage">-</strong></div>
+          <div>Manual: <strong id="tm-manual">-</strong></div>
+          <div>Power-On Output: <strong id="tm-power-on-output">-</strong></div>
+          <div>Self-Stop: <strong id="tm-self-stop">-</strong></div>
+          <div>Language: <strong id="tm-language">-</strong></div>
+          <div>Last RX: <strong id="tm-last-rx">-</strong></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Save Tracking</h2>
+        <ul id="save-track" class="track"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Live Log</h2>
+        <div class="log-wrap">
+          <table class="mono">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Dir</th>
+                <th>Hex</th>
+                <th>Decode</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="log-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+  </html>

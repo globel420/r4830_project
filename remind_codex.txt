@@ -53,3 +53,14 @@ CHECKPOINT 2026-02-08T20:17:23Z
   - charging_statistics_zero -> 06130000000013
 - Current rule for live validation:
   - RX counter increasing + Save Tracking shows ACK = command path is working.
+
+CHECKPOINT 2026-02-08T20:32:00Z
+- Web Bluetooth desktop app added:
+  - /Users/globel/r4830_project/controller/frontend/index.html
+  - /Users/globel/r4830_project/controller/frontend/app.js
+  - /Users/globel/r4830_project/controller/frontend/styles.css
+- Web app supports mapped controls, ACK-aware save tracking, telemetry summary, keepalive loop.
+- Run:
+  - cd /Users/globel/r4830_project/controller/frontend
+  - python3 -m http.server 8787
+  - open http://localhost:8787 in desktop Chrome/Edge
