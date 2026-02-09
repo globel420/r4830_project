@@ -58,6 +58,7 @@ class BleController extends ChangeNotifier {
   bool telemetryPollingEnabled = true;
   double telemetryPollSeconds = 2.0;
   String authPassword = '';
+  bool autoQuickStartOnConnect = true;
   final List<BleLogEntry> logs = [];
   String? lastError;
   String? logDirectory;
@@ -208,6 +209,9 @@ class BleController extends ChangeNotifier {
         autoConnect: false,
       );
       await discoverServices();
+      if (autoQuickStartOnConnect) {
+        await quickStart();
+      }
     } catch (e) {
       lastError = 'Connect failed: $e';
       notifyListeners();

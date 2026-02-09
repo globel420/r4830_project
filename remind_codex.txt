@@ -100,3 +100,10 @@ CHECKPOINT 2026-02-08T22:12:00Z
   - Batch A (no wheel / no active charging)
   - Batch B (wheel / active charging)
 - Added batch subtotals and execution order to minimize wheel setup time.
+
+CHECKPOINT 2026-02-08T22:28:00Z
+- Fixed Power Limit current-value UX bug in Flutter Hub:
+  - "current" value now comes from telemetry (not unsaved text field edits).
+- Added power-limit extraction from:
+  - 6905 bytes 89..90 (LE watts)
+  - cmd 0x27 echo

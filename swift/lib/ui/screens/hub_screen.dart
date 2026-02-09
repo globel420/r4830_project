@@ -399,7 +399,8 @@ class _HubScreenState extends State<HubScreen>
           ),
           _numericSettingRow(
             label: 'Power Limit',
-            currentText: '(${_powerLimitController.text}W)',
+            currentText:
+                '(${_fmtInt(telemetry.powerLimitWatts, unit: 'W', fallback: '--')})',
             controller: _powerLimitController,
             unit: 'W',
             saveKey: 'power_limit',

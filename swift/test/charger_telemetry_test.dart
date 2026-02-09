@@ -113,6 +113,7 @@ void main() {
     expect(telemetry.stage2Voltage, closeTo(150.0, 0.1));
     expect(telemetry.stage2Current, closeTo(0.8, 0.05));
     expect(telemetry.powerOffCurrent, closeTo(0.3, 0.05));
+    expect(telemetry.powerLimitWatts, 1500);
     expect(telemetry.outputEnabled, true);
     expect(telemetry.manualControl, true);
     expect(telemetry.powerOnOutput, true);
@@ -171,5 +172,19 @@ void main() {
     final telemetry = ChargerTelemetryState.fromLogs(logs);
     expect(telemetry.powerOnOutput, true);
     expect(telemetry.twoStageEnabled, false);
+  });
+
+  test('maps cmd 0x27 as power limit watts', () {
+    final logs = [
+      BleLogEntry(
+        timestamp: DateTime.parse('2026-02-07T12:30:00Z'),
+        direction: 'RX',
+        hex: '0627dc05000008',
+        decoded: {'frame_type': '0x06', 'cmd_id': 0x27, 'data32_le_u': 1500},
+      ),
+    ];
+
+    final telemetry = ChargerTelemetryState.fromLogs(logs);
+    expect(telemetry.powerLimitWatts, 1500);
   });
 }

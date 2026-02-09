@@ -19,6 +19,7 @@ class ChargerTelemetryState {
     this.stage2Voltage,
     this.stage2Current,
     this.powerOffCurrent,
+    this.powerLimitWatts,
     this.softStartSeconds,
     this.outputEnabled,
     this.manualControl,
@@ -48,6 +49,7 @@ class ChargerTelemetryState {
   final double? stage2Voltage;
   final double? stage2Current;
   final double? powerOffCurrent;
+  final int? powerLimitWatts;
   final int? softStartSeconds;
 
   final bool? outputEnabled;
@@ -83,6 +85,7 @@ class ChargerTelemetryState {
     double? stage2Voltage;
     double? stage2Current;
     double? powerOffCurrent;
+    int? powerLimitWatts;
     int? softStartSeconds;
 
     bool? outputEnabled;
@@ -166,6 +169,16 @@ class ChargerTelemetryState {
             softStart <= 120) {
           softStartSeconds = softStart;
         }
+        if (powerLimitWatts == null) {
+          final low = _u8At(decoded, 89);
+          final high = _u8At(decoded, 90);
+          if (low != null && high != null) {
+            final watts = low | (high << 8);
+            if (watts >= 100 && watts <= 50000) {
+              powerLimitWatts = watts;
+            }
+          }
+        }
         if (displayLanguage == null) {
           final lang0 = _u8At(decoded, 93);
           final lang1 = _u8At(decoded, 94);
@@ -224,6 +237,8 @@ class ChargerTelemetryState {
           manualControl = valueU == 1;
         case 0x26:
           softStartSeconds = valueU;
+        case 0x27:
+          powerLimitWatts = valueU;
         case 0x2f:
           equalDistributionMode = valueU == 1;
       }
@@ -257,6 +272,7 @@ class ChargerTelemetryState {
       stage2Voltage: stage2Voltage,
       stage2Current: stage2Current,
       powerOffCurrent: powerOffCurrent,
+      powerLimitWatts: powerLimitWatts,
       softStartSeconds: softStartSeconds,
       outputEnabled: outputEnabled,
       manualControl: manualControl,
