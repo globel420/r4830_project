@@ -213,12 +213,12 @@ class TelemetryScreen extends StatelessWidget {
                 cell('Manual control', boolFmt(telemetry.manualControl)),
                 cell('Two-stage', boolFmt(telemetry.twoStageEnabled)),
                 cell(
-                  'Mode',
+                  'Strategy',
                   telemetry.equalDistributionMode == null
                       ? '--'
                       : telemetry.equalDistributionMode!
-                      ? 'Equal Distribution'
-                      : 'Intelligent Control',
+                      ? 'Balanced (Equal Distribution)'
+                      : 'Adaptive (Intelligent)',
                 ),
                 cell('Language', telemetry.displayLanguage ?? '--'),
               ],

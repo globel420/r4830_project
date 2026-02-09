@@ -35,7 +35,7 @@ Status keys: `[ ]` pending, `[x]` complete, `[!]` blocked/fallback needed.
 | 13 | [ ] | Manual Output Control (`0x23`) | ACK both ways; state/readback confirmed | 6 min |
 | 14 | [ ] | Soft Start Time (`0x26`) | ACK and readback value match | 6 min |
 | 15 | [ ] | Power Limit (`0x27`) | ACK and readback value match | 6 min |
-| 17 | [ ] | Multi-Motor Mode (`0x2F`) | Intelligent/Equal both ACK + reflected state | 6 min |
+| 17 | [ ] | Current Strategy Mode (`0x2F`) | Adaptive/Balanced both ACK + reflected state | 6 min |
 | 18 | [ ] | Language: English (`0x2A`) | ACK and reflected state | 4 min |
 | 19 | [ ] | Language: Chinese Simplified (`0x2A`) | ACK and reflected state | 4 min |
 | 20 | [ ] | Language: Chinese Traditional (`0x2A`, candidate) | ACK and reflected state; if fail, mark OEM fallback | 6 min |

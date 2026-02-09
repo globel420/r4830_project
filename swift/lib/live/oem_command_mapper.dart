@@ -198,7 +198,11 @@ class OemCommandMapper {
 
   static CommandMappingResult multiMotorMode(String value) {
     final normalized = value.toLowerCase().trim();
-    final enabled = normalized == 'equal distribution';
+    final enabled =
+        normalized == 'equal distribution' ||
+        normalized == 'balanced (equal distribution)' ||
+        normalized == 'balanced' ||
+        normalized == 'equal';
     return _frame06Bool(
       cmdId: 0x2f,
       enabled: enabled,

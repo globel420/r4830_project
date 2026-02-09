@@ -122,3 +122,15 @@ CHECKPOINT 2026-02-08T22:55:00Z
   - 3006 bytes 43..45 -> stat B (u24 LE)
   - fallback for split 9-byte tail (0000 prefix): bytes 0..2 and 3..5
 - UI label now indicates raw values: `Charge Statistics (raw)`.
+
+CHECKPOINT 2026-02-09T23:09:56Z
+- Flutter wording cleanup for `0x2F` setting (single-output charger context):
+  - "Multi-Motor Control Mode" -> "Current Strategy (Firmware)"
+  - options: "Adaptive (Intelligent)" / "Balanced (Equal Distribution)"
+- Telemetry card label "Mode" -> "Strategy" with same naming.
+- Mapper compatibility kept:
+  - `multiMotorMode(...)` still handles legacy strings and new strings.
+- UI state sync improvement:
+  - strategy and language dropdown values now follow telemetry readback.
+- Checklist terminology aligned:
+  - `FUNCTIONAL_FREEZE_CHECKLIST.md` step 17 renamed to "Current Strategy Mode (`0x2F`)".

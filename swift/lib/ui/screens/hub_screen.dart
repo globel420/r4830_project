@@ -71,7 +71,7 @@ class _HubScreenState extends State<HubScreen>
   bool? _outputEnabledLocal;
   final List<_SaveTrackEntry> _saveTrack = [];
 
-  String _multiMotorMode = 'Intelligent Control';
+  String _multiMotorMode = 'Adaptive (Intelligent)';
   String _displayLanguage = 'English';
 
   @override
@@ -313,8 +313,8 @@ class _HubScreenState extends State<HubScreen>
     final multiMotorCurrent = telemetry.equalDistributionMode == null
         ? _multiMotorMode
         : (telemetry.equalDistributionMode!
-              ? 'Equal Distribution'
-              : 'Intelligent Control');
+              ? 'Balanced (Equal Distribution)'
+              : 'Adaptive (Intelligent)');
     final displayLanguageCurrent =
         telemetry.displayLanguage ?? _displayLanguage;
 
@@ -374,10 +374,13 @@ class _HubScreenState extends State<HubScreen>
             saveKey: 'second_stage_current',
           ),
           _selectSettingRow(
-            label: 'Multi-Motor Control Mode',
+            label: 'Current Strategy (Firmware)',
             currentText: '($multiMotorCurrent)',
             value: _multiMotorMode,
-            options: const ['Intelligent Control', 'Equal Distribution'],
+            options: const [
+              'Adaptive (Intelligent)',
+              'Balanced (Equal Distribution)',
+            ],
             onChanged: (v) => setState(() => _multiMotorMode = v),
             saveKey: 'multi_motor_current_mode',
           ),
@@ -1342,6 +1345,14 @@ class _HubScreenState extends State<HubScreen>
     if (telemetry.outputEnabled != null &&
         _outputEnabledLocal == telemetry.outputEnabled) {
       _outputEnabledLocal = null;
+    }
+    if (telemetry.equalDistributionMode != null) {
+      _multiMotorMode = telemetry.equalDistributionMode!
+          ? 'Balanced (Equal Distribution)'
+          : 'Adaptive (Intelligent)';
+    }
+    if (telemetry.displayLanguage != null) {
+      _displayLanguage = telemetry.displayLanguage!;
     }
   }
 }
