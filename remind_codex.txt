@@ -153,3 +153,9 @@ CHECKPOINT 2026-02-09T23:24:13Z
   - user edits are preserved (startup hydration will not overwrite manual typing)
   - disconnect resets hydration state for next session
 - Added widget regression test for connected-start hydration.
+
+CHECKPOINT 2026-02-09T23:27:31Z
+- Output control in Flutter Hub is now explicit-command based (not toggle-state inferred):
+  - Enable button always sends `output_on` (`0x0C=0`)
+  - Disable button always sends `output_off` (`0x0C=1`)
+- Both buttons remain available to allow force-on/force-off even if telemetry state is wrong.

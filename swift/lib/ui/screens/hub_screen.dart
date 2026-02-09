@@ -831,27 +831,48 @@ class _HubScreenState extends State<HubScreen>
           ),
           Expanded(
             flex: 5,
-            child: SizedBox(
-              height: 56,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _oemBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 56,
+                    child: FilledButton(
+                      key: const Key('output-enable-btn'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _oemBlue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      onPressed: () => _setOutputEnabled(true),
+                      child: const Text(
+                        'Enable Output',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
                   ),
                 ),
-                onPressed: () async {
-                  final next = !enabled;
-                  setState(() {
-                    _outputEnabledLocal = next;
-                  });
-                  await _saved(next ? 'output_on' : 'output_off');
-                },
-                child: Text(
-                  enabled ? 'Disable Output' : 'Enable Output',
-                  style: const TextStyle(fontSize: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 56,
+                    child: FilledButton(
+                      key: const Key('output-disable-btn'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _oemBlue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      onPressed: () => _setOutputEnabled(false),
+                      child: const Text(
+                        'Disable Output',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
           const SizedBox(width: 110),
@@ -918,6 +939,13 @@ class _HubScreenState extends State<HubScreen>
       await Future<void>.delayed(const Duration(milliseconds: 60));
     }
     await _saved('safety_change_password');
+  }
+
+  Future<void> _setOutputEnabled(bool enabled) async {
+    setState(() {
+      _outputEnabledLocal = enabled;
+    });
+    await _saved(enabled ? 'output_on' : 'output_off');
   }
 
   Widget _labelBlock({required String label, required String currentText}) {
