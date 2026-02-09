@@ -69,6 +69,9 @@ class _HubScreenState extends State<HubScreen>
   bool? _twoStageLocal;
   bool? _manualControlLocal;
   bool? _outputEnabledLocal;
+  bool _outputCurrentHydratedFromTelemetry = false;
+  bool _outputCurrentEditedSinceConnect = false;
+  bool _syncingOutputCurrentText = false;
   final List<_SaveTrackEntry> _saveTrack = [];
 
   String _multiMotorMode = 'Adaptive (Intelligent)';
@@ -78,6 +81,10 @@ class _HubScreenState extends State<HubScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _outputCurrentController.addListener(() {
+      if (_syncingOutputCurrentText) return;
+      _outputCurrentEditedSinceConnect = true;
+    });
   }
 
   @override
@@ -101,7 +108,10 @@ class _HubScreenState extends State<HubScreen>
   Widget build(BuildContext context) {
     final controller = context.watch<BleController>();
     final telemetry = ChargerTelemetryState.fromLogs(controller.rxLogs);
-    _syncToggleStateFromTelemetry(telemetry);
+    _syncToggleStateFromTelemetry(
+      isConnected: controller.isConnected,
+      telemetry: telemetry,
+    );
     return Scaffold(
       backgroundColor: const Color(0xFFEFEFEF),
       body: SafeArea(
@@ -279,6 +289,7 @@ class _HubScreenState extends State<HubScreen>
             currentText:
                 '(${_fmtNum(telemetry.outputSetCurrent, unit: 'A', fallback: '--')})',
             controller: _outputCurrentController,
+            fieldKey: const Key('output-current-limit-input'),
             unit: 'A',
             saveKey: 'output_current_limit',
           ),
@@ -686,6 +697,7 @@ class _HubScreenState extends State<HubScreen>
     required String label,
     required String currentText,
     required TextEditingController controller,
+    Key? fieldKey,
     required String unit,
     required String saveKey,
   }) {
@@ -707,6 +719,7 @@ class _HubScreenState extends State<HubScreen>
               children: [
                 Expanded(
                   child: TextField(
+                    key: fieldKey,
                     controller: controller,
                     style: const TextStyle(fontSize: 20),
                     decoration: InputDecoration(
@@ -1313,7 +1326,33 @@ class _HubScreenState extends State<HubScreen>
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _syncToggleStateFromTelemetry(ChargerTelemetryState telemetry) {
+  void _syncToggleStateFromTelemetry({
+    required bool isConnected,
+    required ChargerTelemetryState telemetry,
+  }) {
+    if (!isConnected) {
+      _outputCurrentHydratedFromTelemetry = false;
+      _outputCurrentEditedSinceConnect = false;
+    }
+    if (isConnected &&
+        !_outputCurrentHydratedFromTelemetry &&
+        !_outputCurrentEditedSinceConnect) {
+      final startupCurrent =
+          telemetry.outputSetCurrent ?? telemetry.outputCurrent;
+      if (startupCurrent != null &&
+          startupCurrent.isFinite &&
+          startupCurrent >= _minCurrentAmps) {
+        final text = _fmtInputValue(startupCurrent);
+        if (_outputCurrentController.text != text) {
+          _syncingOutputCurrentText = true;
+          _outputCurrentController
+            ..text = text
+            ..selection = TextSelection.collapsed(offset: text.length);
+          _syncingOutputCurrentText = false;
+        }
+        _outputCurrentHydratedFromTelemetry = true;
+      }
+    }
     if (telemetry.powerOnOutput != null) {
       final next = telemetry.powerOnOutput!;
       if (_powerOnOutputLocal == null || _powerOnOutputLocal == next) {
@@ -1354,6 +1393,11 @@ class _HubScreenState extends State<HubScreen>
     if (telemetry.displayLanguage != null) {
       _displayLanguage = telemetry.displayLanguage!;
     }
+  }
+
+  String _fmtInputValue(double value) {
+    final fixed = value.toStringAsFixed(2);
+    return fixed.replaceFirst(RegExp(r'\.?0+$'), '');
   }
 }
 

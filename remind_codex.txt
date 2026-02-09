@@ -144,3 +144,12 @@ CHECKPOINT 2026-02-09T23:17:52Z
   - Source precedence now: `cmd 0x0C` echo > `6905` flag > `3006` flag.
 - Hub UI no longer keeps stale local output state once telemetry has a real output-enabled value.
 - Added regression coverage to ensure `cmd 0x0C` overrides candidate long-frame flags.
+
+CHECKPOINT 2026-02-09T23:24:13Z
+- Hub Output Current Limit input now hydrates from charger telemetry at session start.
+- Hydration behavior:
+  - source order: `outputSetCurrent` then `outputCurrent`
+  - one-time per connection
+  - user edits are preserved (startup hydration will not overwrite manual typing)
+  - disconnect resets hydration state for next session
+- Added widget regression test for connected-start hydration.
