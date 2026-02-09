@@ -73,4 +73,53 @@ void main() {
       expect(field.controller?.text, '6.7');
     },
   );
+
+  testWidgets('Output status keeps commanded state when telemetry lags', (
+    WidgetTester tester,
+  ) async {
+    Finder outputStatusFinder(String status) {
+      return find.byWidgetPredicate((widget) {
+        if (widget is! RichText) return false;
+        final plain = widget.text.toPlainText();
+        return plain.contains('Output Enable') && plain.contains(status);
+      });
+    }
+
+    final controller = BleController(bindPlatformStreams: false);
+    controller.connectionState = BluetoothConnectionState.connected;
+    controller.logs.insert(
+      0,
+      BleLogEntry(
+        timestamp: DateTime.parse('2026-02-10T00:01:00Z'),
+        direction: 'RX',
+        hex: '060c010000000d',
+        decoded: {'frame_type': '0x06', 'cmd_id': 0x0c, 'data32_le_u': 1},
+      ),
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<BleController>.value(
+        value: controller,
+        child: MaterialApp(
+          home: HubScreen(
+            onOpenReplay: () {},
+            onOpenLive: () {},
+            onOpenTelemetry: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final enableBtnFinder = find.byKey(const Key('output-enable-btn'));
+    for (var i = 0; i < 8 && enableBtnFinder.evaluate().isEmpty; i++) {
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -320));
+      await tester.pump();
+    }
+    expect(enableBtnFinder, findsOneWidget);
+    expect(outputStatusFinder('(Disabled)'), findsOneWidget);
+
+    await tester.tap(enableBtnFinder);
+    await tester.pump();
+    expect(outputStatusFinder('(Enabled)'), findsOneWidget);
+  });
 }

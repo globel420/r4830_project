@@ -159,3 +159,9 @@ CHECKPOINT 2026-02-09T23:27:31Z
   - Enable button always sends `output_on` (`0x0C=0`)
   - Disable button always sends `output_off` (`0x0C=1`)
 - Both buttons remain available to allow force-on/force-off even if telemetry state is wrong.
+
+CHECKPOINT 2026-02-09T23:31:24Z
+- Fixed Hub status label lag for output enable/disable.
+- Output status now keeps commanded local state until telemetry matches.
+- Local output status override resets on disconnect.
+- Added widget regression test for telemetry-lag scenario.

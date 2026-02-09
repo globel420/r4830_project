@@ -1359,6 +1359,7 @@ class _HubScreenState extends State<HubScreen>
     required ChargerTelemetryState telemetry,
   }) {
     if (!isConnected) {
+      _outputEnabledLocal = null;
       _outputCurrentHydratedFromTelemetry = false;
       _outputCurrentEditedSinceConnect = false;
     }
@@ -1409,8 +1410,9 @@ class _HubScreenState extends State<HubScreen>
         _manualControlLocal = null;
       }
     }
-    if (telemetry.outputEnabled != null) {
-      // Always release optimistic local override once real telemetry is present.
+    if (telemetry.outputEnabled != null &&
+        (_outputEnabledLocal == null ||
+            _outputEnabledLocal == telemetry.outputEnabled)) {
       _outputEnabledLocal = null;
     }
     if (telemetry.equalDistributionMode != null) {
