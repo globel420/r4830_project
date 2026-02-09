@@ -116,7 +116,7 @@ void main() {
     expect(telemetry.stage2Current, closeTo(0.8, 0.05));
     expect(telemetry.powerOffCurrent, closeTo(0.3, 0.05));
     expect(telemetry.powerLimitWatts, 1500);
-    expect(telemetry.outputEnabled, true);
+    expect(telemetry.outputEnabled, false);
     expect(telemetry.manualControl, true);
     expect(telemetry.powerOnOutput, true);
     expect(telemetry.twoStageEnabled, true);
@@ -188,6 +188,29 @@ void main() {
 
     final telemetry = ChargerTelemetryState.fromLogs(logs);
     expect(telemetry.powerLimitWatts, 1500);
+  });
+
+  test('prefers cmd 0x0c output state over candidate status flags', () {
+    final logs = [
+      BleLogEntry(
+        timestamp: DateTime.parse('2026-02-07T12:32:00Z'),
+        direction: 'RX',
+        hex: '6905',
+        decoded: {
+          'pkt_prefix': '6905',
+          'u8_77': 1, // Candidate status byte (maps to off/close).
+        },
+      ),
+      BleLogEntry(
+        timestamp: DateTime.parse('2026-02-07T12:32:01Z'),
+        direction: 'RX',
+        hex: '060c000000000c',
+        decoded: {'frame_type': '0x06', 'cmd_id': 0x0c, 'data32_le_u': 0},
+      ),
+    ];
+
+    final telemetry = ChargerTelemetryState.fromLogs(logs);
+    expect(telemetry.outputEnabled, true);
   });
 
   test('extracts charge statistics raw counters from 9-byte tail frames', () {

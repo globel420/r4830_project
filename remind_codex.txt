@@ -134,3 +134,13 @@ CHECKPOINT 2026-02-09T23:09:56Z
   - strategy and language dropdown values now follow telemetry readback.
 - Checklist terminology aligned:
   - `FUNCTIONAL_FREEZE_CHECKLIST.md` step 17 renamed to "Current Strategy Mode (`0x2F`)".
+
+CHECKPOINT 2026-02-09T23:17:52Z
+- Fixed output enable readback mismatch in Flutter Hub.
+- Decoder changes:
+  - `3006` byte 38 and `6905` byte 77 candidate flags now mapped as:
+    - 0 => output enabled/open
+    - 1 => output disabled/close
+  - Source precedence now: `cmd 0x0C` echo > `6905` flag > `3006` flag.
+- Hub UI no longer keeps stale local output state once telemetry has a real output-enabled value.
+- Added regression coverage to ensure `cmd 0x0C` overrides candidate long-frame flags.

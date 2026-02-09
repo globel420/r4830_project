@@ -1342,8 +1342,8 @@ class _HubScreenState extends State<HubScreen>
         _manualControlLocal = null;
       }
     }
-    if (telemetry.outputEnabled != null &&
-        _outputEnabledLocal == telemetry.outputEnabled) {
+    if (telemetry.outputEnabled != null) {
+      // Always release optimistic local override once real telemetry is present.
       _outputEnabledLocal = null;
     }
     if (telemetry.equalDistributionMode != null) {

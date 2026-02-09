@@ -133,7 +133,9 @@ class ChargerTelemetryState {
         throttlingPercent ??= _bounded(_f32At(decoded, 34), min: 0, max: 100);
         final outputFlag = _u8At(decoded, 38);
         if (outputFlag != null && (outputFlag == 0 || outputFlag == 1)) {
-          outputEnabledFrom3006 ??= outputFlag == 1;
+          // Candidate mapping (matches current-path command semantics):
+          // 0 => Open/On, 1 => Close/Off.
+          outputEnabledFrom3006 ??= outputFlag == 0;
         }
         final sA0 = _u8At(decoded, 40);
         final sA1 = _u8At(decoded, 41);
@@ -192,7 +194,9 @@ class ChargerTelemetryState {
         powerOffCurrent ??= _bounded(_f32At(decoded, 44), min: 0, max: 200);
         final outputFlag = _u8At(decoded, 77);
         if (outputFlag != null && (outputFlag == 0 || outputFlag == 1)) {
-          outputEnabledFrom6905 ??= outputFlag == 1;
+          // Candidate mapping (matches current-path command semantics):
+          // 0 => Open/On, 1 => Close/Off.
+          outputEnabledFrom6905 ??= outputFlag == 0;
         }
         stage2Voltage ??= _bounded(_f32At(decoded, 78), min: 0, max: 300);
         stage2Current ??= _bounded(_f32At(decoded, 82), min: 0, max: 200);
@@ -291,9 +295,9 @@ class ChargerTelemetryState {
       }
     }
     outputEnabled =
+        outputEnabledFrom06 ??
         outputEnabledFrom6905 ??
         outputEnabledFrom3006 ??
-        outputEnabledFrom06 ??
         outputEnabled;
 
     final computedOutputPower =
