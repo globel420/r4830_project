@@ -28,6 +28,7 @@ class _HubScreenState extends State<HubScreen>
   static const _lineColor = Color(0xFFDADADA);
   static const _valueBlue = Color(0xFF2437C8);
   static const _maxSaveTrack = 40;
+  static const _minCurrentAmps = 0.3;
 
   late final TabController _tabController;
 
@@ -264,7 +265,7 @@ class _HubScreenState extends State<HubScreen>
             rightValue: '',
           ),
           _sectionHeader('Settings'),
-          _statsRow(),
+          _statsRow(telemetry),
           _numericSettingRow(
             label: 'Output Voltage Setpoint',
             currentText:
@@ -601,7 +602,7 @@ class _HubScreenState extends State<HubScreen>
     );
   }
 
-  Widget _statsRow() {
+  Widget _statsRow(ChargerTelemetryState telemetry) {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -612,19 +613,22 @@ class _HubScreenState extends State<HubScreen>
         children: [
           const Expanded(
             flex: 3,
-            child: Text('Charge Statistics', style: TextStyle(fontSize: 16)),
+            child: Text(
+              'Charge Statistics (raw)',
+              style: TextStyle(fontSize: 16),
+            ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
             child: Text(
-              '--',
+              _fmtInt(telemetry.chargeStatRawA, unit: '', fallback: '--'),
               style: TextStyle(fontSize: 18, color: _valueBlue),
             ),
           ),
-          const Expanded(
+          Expanded(
             flex: 2,
             child: Text(
-              '--',
+              _fmtInt(telemetry.chargeStatRawB, unit: '', fallback: '--'),
               style: TextStyle(fontSize: 18, color: _valueBlue),
             ),
           ),
@@ -1145,6 +1149,11 @@ class _HubScreenState extends State<HubScreen>
           _showMessage('Invalid power-off current value.');
           return null;
         }
+        final stage2Current = _parseDouble(_secondStageCurrentController.text);
+        if (stage2Current != null && value > stage2Current) {
+          _showMessage('Power-off current cannot exceed Stage 2 current.');
+          return null;
+        }
         return OemCommandMapper.powerOffCurrent(value);
       case 'second_stage_voltage':
         final value = _parseDouble(_secondStageVoltageController.text);
@@ -1157,6 +1166,19 @@ class _HubScreenState extends State<HubScreen>
         final value = _parseDouble(_secondStageCurrentController.text);
         if (value == null) {
           _showMessage('Invalid second-stage current value.');
+          return null;
+        }
+        if (value < _minCurrentAmps) {
+          _showMessage(
+            'Stage 2 current must be at least ${_minCurrentAmps.toStringAsFixed(1)}A.',
+          );
+          return null;
+        }
+        final powerOffCurrent = _parseDouble(_powerOffCurrentController.text);
+        if (powerOffCurrent != null && value < powerOffCurrent) {
+          _showMessage(
+            'Stage 2 current cannot be lower than power-off current.',
+          );
           return null;
         }
         return OemCommandMapper.secondStageCurrent(value);
@@ -1190,6 +1212,12 @@ class _HubScreenState extends State<HubScreen>
         final value = _parseDouble(_outputCurrentController.text);
         if (value == null) {
           _showMessage('Invalid current limit value.');
+          return null;
+        }
+        if (value < _minCurrentAmps) {
+          _showMessage(
+            'Output current limit must be at least ${_minCurrentAmps.toStringAsFixed(1)}A.',
+          );
           return null;
         }
         return OemCommandMapper.outputCurrentSetpoint(value);

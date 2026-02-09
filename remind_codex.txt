@@ -107,3 +107,18 @@ CHECKPOINT 2026-02-08T22:28:00Z
 - Added power-limit extraction from:
   - 6905 bytes 89..90 (LE watts)
   - cmd 0x27 echo
+
+CHECKPOINT 2026-02-08T22:40:00Z
+- Added current-limit guardrails in Hub validation:
+  - output current >= 0.3A
+  - stage 2 current >= 0.3A
+  - stage 2 current >= power-off current
+  - power-off current <= stage 2 current
+
+CHECKPOINT 2026-02-08T22:55:00Z
+- Charge Statistics row now pulls raw counters from telemetry (not placeholders).
+- Source mapping:
+  - 3006 bytes 40..42 -> stat A (u24 LE)
+  - 3006 bytes 43..45 -> stat B (u24 LE)
+  - fallback for split 9-byte tail (0000 prefix): bytes 0..2 and 3..5
+- UI label now indicates raw values: `Charge Statistics (raw)`.

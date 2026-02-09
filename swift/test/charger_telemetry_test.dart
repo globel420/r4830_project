@@ -108,6 +108,8 @@ void main() {
     expect(telemetry.inputFrequencyHz, closeTo(59.9, 0.2));
     expect(telemetry.outputVoltage, closeTo(3.5, 0.05));
     expect(telemetry.outputCurrent, closeTo(0.0, 0.05));
+    expect(telemetry.chargeStatRawA, 3735624);
+    expect(telemetry.chargeStatRawB, 14744444);
     expect(telemetry.outputSetVoltage, closeTo(149.0, 0.1));
     expect(telemetry.outputSetCurrent, closeTo(0.5, 0.05));
     expect(telemetry.stage2Voltage, closeTo(150.0, 0.1));
@@ -186,5 +188,32 @@ void main() {
 
     final telemetry = ChargerTelemetryState.fromLogs(logs);
     expect(telemetry.powerLimitWatts, 1500);
+  });
+
+  test('extracts charge statistics raw counters from 9-byte tail frames', () {
+    final logs = [
+      BleLogEntry(
+        timestamp: DateTime.parse('2026-02-07T12:35:00Z'),
+        direction: 'RX',
+        hex: '0000000000000001b2',
+        decoded: {
+          'len': 9,
+          'pkt_prefix': '0000',
+          'u8_00': 0,
+          'u8_01': 0,
+          'u8_02': 0,
+          'u8_03': 0,
+          'u8_04': 0,
+          'u8_05': 0,
+          'u8_06': 0,
+          'u8_07': 1,
+          'u8_08': 0xb2,
+        },
+      ),
+    ];
+
+    final telemetry = ChargerTelemetryState.fromLogs(logs);
+    expect(telemetry.chargeStatRawA, 0);
+    expect(telemetry.chargeStatRawB, 0);
   });
 }

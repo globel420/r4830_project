@@ -28,6 +28,8 @@ class ChargerTelemetryState {
     this.selfStop,
     this.equalDistributionMode,
     this.displayLanguage,
+    this.chargeStatRawA,
+    this.chargeStatRawB,
     this.lastRxAt,
   });
 
@@ -59,6 +61,8 @@ class ChargerTelemetryState {
   final bool? selfStop;
   final bool? equalDistributionMode;
   final String? displayLanguage;
+  final int? chargeStatRawA;
+  final int? chargeStatRawB;
 
   final DateTime? lastRxAt;
 
@@ -95,6 +99,8 @@ class ChargerTelemetryState {
     bool? selfStop;
     bool? equalDistributionMode;
     String? displayLanguage;
+    int? chargeStatRawA;
+    int? chargeStatRawB;
     bool? outputEnabledFrom6905;
     bool? outputEnabledFrom3006;
     bool? outputEnabledFrom06;
@@ -128,6 +134,47 @@ class ChargerTelemetryState {
         final outputFlag = _u8At(decoded, 38);
         if (outputFlag != null && (outputFlag == 0 || outputFlag == 1)) {
           outputEnabledFrom3006 ??= outputFlag == 1;
+        }
+        final sA0 = _u8At(decoded, 40);
+        final sA1 = _u8At(decoded, 41);
+        final sA2 = _u8At(decoded, 42);
+        if (chargeStatRawA == null &&
+            sA0 != null &&
+            sA1 != null &&
+            sA2 != null) {
+          chargeStatRawA = sA0 | (sA1 << 8) | (sA2 << 16);
+        }
+        final sB0 = _u8At(decoded, 43);
+        final sB1 = _u8At(decoded, 44);
+        final sB2 = _u8At(decoded, 45);
+        if (chargeStatRawB == null &&
+            sB0 != null &&
+            sB1 != null &&
+            sB2 != null) {
+          chargeStatRawB = sB0 | (sB1 << 8) | (sB2 << 16);
+        }
+      }
+
+      if (prefix == '0000' && decoded['len'] == 9) {
+        // Fallback for captured ATT tail packets where the stats tail arrives
+        // as a separate 9-byte notification.
+        final sA0 = _u8At(decoded, 0);
+        final sA1 = _u8At(decoded, 1);
+        final sA2 = _u8At(decoded, 2);
+        if (chargeStatRawA == null &&
+            sA0 != null &&
+            sA1 != null &&
+            sA2 != null) {
+          chargeStatRawA = sA0 | (sA1 << 8) | (sA2 << 16);
+        }
+        final sB0 = _u8At(decoded, 3);
+        final sB1 = _u8At(decoded, 4);
+        final sB2 = _u8At(decoded, 5);
+        if (chargeStatRawB == null &&
+            sB0 != null &&
+            sB1 != null &&
+            sB2 != null) {
+          chargeStatRawB = sB0 | (sB1 << 8) | (sB2 << 16);
         }
       }
 
@@ -256,9 +303,7 @@ class ChargerTelemetryState {
             : null);
     final computedEfficiency =
         efficiencyPercent ??
-        ((computedOutputPower != null &&
-                inputPowerW != null &&
-                inputPowerW > 0)
+        ((computedOutputPower != null && inputPowerW != null && inputPowerW > 0)
             ? _bounded(
                 (computedOutputPower / inputPowerW) * 100.0,
                 min: 0,
@@ -293,6 +338,8 @@ class ChargerTelemetryState {
       selfStop: selfStop,
       equalDistributionMode: equalDistributionMode,
       displayLanguage: displayLanguage,
+      chargeStatRawA: chargeStatRawA,
+      chargeStatRawB: chargeStatRawB,
       lastRxAt: rxLogs.first.timestamp,
     );
   }
