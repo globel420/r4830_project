@@ -254,6 +254,17 @@ class ChargerTelemetryState {
         ((outputVoltage != null && outputCurrent != null)
             ? outputVoltage * outputCurrent
             : null);
+    final computedEfficiency =
+        efficiencyPercent ??
+        ((computedOutputPower != null &&
+                inputPowerW != null &&
+                inputPowerW > 0)
+            ? _bounded(
+                (computedOutputPower / inputPowerW) * 100.0,
+                min: 0,
+                max: 100,
+              )
+            : null);
 
     return ChargerTelemetryState(
       firmwareVersion: firmwareVersion,
@@ -269,6 +280,7 @@ class ChargerTelemetryState {
       throttlingPercent: throttlingPercent,
       inputPowerW: inputPowerW,
       outputPowerW: computedOutputPower,
+      efficiencyPercent: computedEfficiency,
       stage2Voltage: stage2Voltage,
       stage2Current: stage2Current,
       powerOffCurrent: powerOffCurrent,
